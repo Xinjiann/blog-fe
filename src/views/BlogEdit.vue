@@ -1,17 +1,12 @@
 <template>
-
-    <div>
-        BlogEdit
-    </div>
-    
+  <div>BlogEdit</div>
 </template>
 
 <script>
-    export default {
-        name: "BlogEdit"
-    }
+export default {
+  name: "BlogEdit",
+};
 </script>
 
 <style scoped>
-
 </style>
