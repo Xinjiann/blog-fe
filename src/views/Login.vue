@@ -23,8 +23,9 @@
             <el-input type="password" v-model="ruleForm.password"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+            <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
             <el-button @click="resetForm('ruleForm')">重置</el-button>
+            <el-button @click="signUp">注册</el-button>
           </el-form-item>
         </el-form>
       </el-main>
@@ -38,8 +39,8 @@ export default {
   data() {
     return {
       ruleForm: {
-        username: "markerhub",
-        password: "111111",
+        username: "",
+        password: "",
       },
       rules: {
         username: [
@@ -53,12 +54,22 @@ export default {
     };
   },
   methods: {
+    signUp(){
+      this.$axios.post('/signUp', this.ruleForm).then(res => {
+        this.$alert('操作成功', '提示', {
+          callback: action => {
+            this.$router.go(0);
+          }
+        });
+      })
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const _this = this;
           this.$axios.post('/login', this.ruleForm).then(res => {
             const jwt = res.headers['authorization'];
+            console.log(res)
             const userInfo = res.data.data;
             // 把数据共享出去
             _this.$store.commit("SET_TOKEN", jwt)
@@ -77,8 +88,10 @@ export default {
       });
     },
     resetForm(formName) {
-      this.$refs[formName].resetFields();
+      this.ruleForm.username = "";
+      this.ruleForm.password = "";
     },
+
   },
 };
 </script>

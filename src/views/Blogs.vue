@@ -5,7 +5,7 @@
     <div class="block">
       <el-timeline>
 
-        <el-timeline-item :timestamp="blog.created" placement="top" v-for="blog in blogs">
+        <el-timeline-item :timestamp="blog.created" placement="top" v-for="blog in blogs" :key="blog.id">
           <el-card>
             <h4>
               <router-link :to="{name: 'BlogDetail', params: {blogId: blog.id}}">
@@ -50,7 +50,6 @@
       page(currentPage) {
         const _this = this
         _this.$axios.get("/blogs?currentPage=" + currentPage).then(res => {
-          console.log(res)
           _this.blogs = res.data.data.records
           _this.currentPage = res.data.data.current
           _this.total = res.data.data.total

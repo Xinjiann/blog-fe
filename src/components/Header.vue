@@ -27,7 +27,7 @@
       return {
         user: {
           username: '请先登录',
-          avatar: 'https://i0.hdslb.com/bfs/face/58b235dc8b766f7e76a898b5d3606be3898c5feb.jpg@96w_96h_1c_1s.webp'
+          avatar: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.cwq.com%2F201712%2F1513090030590881.jpeg&refer=http%3A%2F%2Fimg.cwq.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641122100&t=ab3415d9c369021a9e836e22362b0122'
         },
         hasLogin: false
       }
