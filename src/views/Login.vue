@@ -15,6 +15,7 @@
           ref="ruleForm"
           label-width="100px"
           class="demo-ruleForm"
+          style="width: 500px; margin-left: 170px"
         >
           <el-form-item label="用户名" prop="username">
             <el-input v-model="ruleForm.username"></el-input>
@@ -55,13 +56,7 @@ export default {
   },
   methods: {
     signUp(){
-      this.$axios.post('/signUp', this.ruleForm).then(res => {
-        this.$alert('操作成功', '提示', {
-          callback: action => {
-            this.$router.go(0);
-          }
-        });
-      })
+      this.$router.push("/signUp");
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -117,6 +112,7 @@ export default {
   color: #333;
   text-align: center;
   line-height: 160px;
+
 }
 
 body > .el-container {
