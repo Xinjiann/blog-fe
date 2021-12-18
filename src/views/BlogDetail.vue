@@ -11,6 +11,7 @@
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
+      <Comment :comments="commentData"></Comment>
       <div v-for="comment in comments" :key="comment.id"> {{comment.content}}</div>
 
     </div>
@@ -21,12 +22,16 @@
 <script>
   import 'github-markdown-css'
   import Header from "../components/Header";
+  import * as CommentData from '../mockdata'
+  import Comment from '../components/Comment'
 
   export default {
+
     name: "BlogDetail.vue",
-    components: {Header},
+    components: {Header, Comment},
     data() {
       return {
+        commentData: [],
         blog: {
           id: "",
           title: "",
@@ -41,6 +46,7 @@
       }
     },
     created() {
+      this.commentData = CommentData.comment.data;
       const blogId = this.$route.params.blogId
       const _this = this
       this.$axios.get('/blog/' + blogId).then(res => {
@@ -56,28 +62,12 @@
         _this.ownBlog = (blog.userId === _this.$store.getters.getUser.id)
 
       })
-
       this.$axios.get('/comment/' + 1).then(res => {
         const comments = res.data.data
-        
         for(let i=0; i<comments.length; i++){
-          
           let comment = comments[i];
-          _this.comments.push(
-            {
-              createUser: "",
-              createTime: "",
-              content: "",
-            }
-          )
-          _this.comments[i].createUser = comment.createUser
-          _this.comments[i].createTime = comment.createTime
-          _this.comments[i].content = comment.content
-          
-        }
-        
-        
-
+          _this.comments.push(comment)
+        }     
       })
     }
   }
