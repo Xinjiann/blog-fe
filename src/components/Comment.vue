@@ -1,41 +1,63 @@
 <!--评论模块-->
 <template>
   <div class="container">
+    
+    <div style="font-size: 1.5em;">评论区</div>
+    <br>
+    
+    <el-input class="gray-bg-input"
+              v-model="inputComment"
+              type="textarea"
+              :rows="3"
+              autofocus
+              placeholder="写下你的评论">
+    </el-input>
+    <br>
+    <br>
+    
+    <el-button class="btn" style="float: right;" type="success" round @click="commitComment(inputComment)">确定</el-button>
+    <br>
+    <br>
+
+    
+    
+    
+    
     <div class="comment" v-for="item in comments">
       <div class="info">
-        <img class="avatar" :src="item.fromAvatar" width="36" height="36"/>
+        <img class="avatar" :src="item.userAvatar" width="36" height="36"/>
         <div class="right">
-          <div class="name">{{item.fromName}}</div>
-          <div class="date">{{item.date}}</div>
+          <div class="name">{{item.createUser}}</div>
+          <div class="date">{{item.createTime}}</div>
         </div>
       </div>
       <div class="content">{{item.content}}</div>
       <div class="control">
-        <span class="like" :class="{active: item.isLike}" @click="likeClick(item)">
+        <!-- <span class="like" :class="{active: item.isLike}" @click="likeClick(item)">
           <i class="iconfont icon-like"></i>
           <span class="like-num">{{item.likeNum > 0 ? item.likeNum + '人赞' : '赞'}}</span>
-        </span>
+        </span> -->
         <span class="comment-reply" @click="showCommentInput(item)">
           <i class="iconfont icon-comment"></i>
           <span>回复</span>
         </span>
       </div>
       <div class="reply">
-        <div class="item" v-for="reply in item.reply">
+        <div class="item" v-for="reply in item.reply.replies">
           <div class="reply-content">
-            <span class="from-name">{{reply.fromName}}</span><span>: </span>
-            <span class="to-name">@{{reply.toName}}</span>
+            <span class="from-name">{{reply.createUser}}</span><span>: </span>
+            <!-- <span class="to-name">@{{reply.toName}}</span> -->
             <span>{{reply.content}}</span>
           </div>
-          <div class="reply-bottom">
-            <span>{{reply.date}}</span>
+          <!-- <div class="reply-bottom">
+            <span>{{reply.createTime}}</span>
             <span class="reply-text" @click="showCommentInput(item, reply)">
               <i class="iconfont icon-comment"></i>
-              <span>回复</span>
+              <span>回复111</span>
             </span>
-          </div>
+          </div> -->
         </div>
-        <div class="write-reply" v-if="item.reply.length > 0" @click="showCommentInput(item)">
+        <div class="write-reply" v-if="item.reply.replies.length > 0" @click="showCommentInput(item)">
           <i class="el-icon-edit"></i>
           <span class="add-comment">添加新评论</span>
         </div>
@@ -50,7 +72,7 @@
             </el-input>
             <div class="btn-control">
               <span class="cancel" @click="cancel">取消</span>
-              <el-button class="btn" type="success" round @click="commitComment">确定</el-button>
+              <el-button class="btn" type="success" round @click="commitReply(item.id, inputComment)">确定</el-button>
             </div>
           </div>
         </transition>
@@ -68,13 +90,15 @@
       comments: {
         type: Array,
         required: true
-      }
+      },
+      createUserInfo: Object,
     },
     components: {},
     data() {
       return {
         inputComment: '',
-        showItemId: ''
+        showItemId: '',
+        userInfo: '',
       }
     },
     computed: {},
@@ -83,17 +107,18 @@
        * 点赞
        */
       likeClick(item) {
-        if (item.isLike === null) {
-          Vue.$set(item, "isLike", true);
-          item.likeNum++
-        } else {
-          if (item.isLike) {
-            item.likeNum--
-          } else {
-            item.likeNum++
-          }
-          item.isLike = !item.isLike;
-        }
+        // if (item.isLike === null) {
+        //   Vue.$set(item, "isLike", true);
+        //   item.likeNum++
+        // } else {
+        //   if (item.isLike) {
+        //     item.likeNum--
+        //   } else {
+        //     item.likeNum++
+        //   }
+        //   item.isLike = !item.isLike;
+        // }
+        console.log("点赞")
       },
 
       /**
@@ -106,9 +131,43 @@
       /**
        * 提交评论
        */
-      commitComment() {
-        console.log(this.inputComment);
+      commitComment(inputComment) {
+        const blogId = this.$route.params.blogId
+        
+        const commentForm = {
+          blogId: blogId,
+          createUser: this.userInfo.username,
+          userAvatar: this.userInfo.avatar,
+          content: inputComment,
+        }
+        this.$axios.post('/comment/comment', commentForm).then(res => {
+          this.$alert('操作成功', '提示', {
+            callback: action => {
+              this.$router.go(0);
+            }
+          });
+        })
+        
       },
+
+      commitReply(commentId, inputComment) {
+        const replyForm = {
+          commentId: commentId,
+          content: inputComment,
+          createUser: this.userInfo.username,
+          userAvatar: this.userInfo.avatar,
+        }
+      this.$axios.post('/comment/reply', replyForm).then(res => {
+          this.$alert('操作成功', '提示', {
+            callback: action => {
+              this.$router.go(0);
+            }
+          });
+        })
+
+
+      },
+
 
       /**
        * 点击评论按钮显示输入框
@@ -125,7 +184,7 @@
       }
     },
     created() {
-      console.log(this.comments)
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
     }
   }
 </script>

@@ -11,8 +11,7 @@
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
-      <Comment :comments="commentData"></Comment>
-      <div v-for="comment in comments" :key="comment.id"> {{comment.content}}</div>
+      <Comment :comments="commentData" :createUserInfo="createUserInfo"></Comment>
 
     </div>
 
@@ -36,39 +35,56 @@
           id: "",
           title: "",
           content: "",
-        },
-        comments: [{
           createUser: "",
-          createTime: "",
-          content: "",
-        }],
-        ownBlog: false
+        },
+        comments: [],
+        ownBlog: false,
+        createUserId: 0,
+        createUserInfo: {
+          name: "",
+          avatar: "",
+        },
       }
     },
     created() {
-      this.commentData = CommentData.comment.data;
+      
       const blogId = this.$route.params.blogId
-      const _this = this
-      this.$axios.get('/blog/' + blogId).then(res => {
-        const blog = res.data.data
-        _this.blog.id = blog.id
-        _this.blog.title = blog.title
-
-        var MardownIt = require("markdown-it")
-        var md = new MardownIt()
-
-        var result = md.render(blog.content)
-        _this.blog.content = result
-        _this.ownBlog = (blog.userId === _this.$store.getters.getUser.id)
-
-      })
-      this.$axios.get('/comment/' + 1).then(res => {
+      this.getBlog(blogId);
+      this.$axios.get('/comment/' + blogId).then(res => {
         const comments = res.data.data
         for(let i=0; i<comments.length; i++){
           let comment = comments[i];
-          _this.comments.push(comment)
+          this.comments.push(comment)
         }     
       })
+      this.commentData = this.comments;
+      
+    },
+    methods: {
+      async getBlog(blogId){
+        await this.$axios.get('/blog/' + blogId).then(res => {
+          const blog = res.data.data
+          this.blog.id = blog.id
+          this.blog.title = blog.title
+          this.createUserId = blog.userId;
+          var MardownIt = require("markdown-it")
+          var md = new MardownIt()
+
+          var result = md.render(blog.content)
+          this.blog.content = result
+          this.ownBlog = (blog.userId === this.$store.getters.getUser.id)
+
+        })
+        this.getUserInfo();
+      },
+      
+      getUserInfo(){
+        this.$axios.get('/user/getUser/' + this.createUserId).then(res => {
+          const user = res.data.data
+          this.createUserInfo.name = user.username;
+          this.createUserInfo.avatar = user.avatar;
+        });
+      }
     }
   }
 </script>
