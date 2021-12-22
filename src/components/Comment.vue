@@ -18,10 +18,6 @@
     <el-button class="btn" style="float: right;" type="success" round @click="commitComment(inputComment)">确定</el-button>
     <br>
     <br>
-
-    
-    
-    
     
     <div class="comment" v-for="item in comments">
       <div class="info">

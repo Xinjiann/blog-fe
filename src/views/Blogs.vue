@@ -54,9 +54,11 @@
           _this.currentPage = res.data.data.current
           _this.total = res.data.data.total
           _this.pageSize = res.data.data.size
+          console.log(res)
 
         })
       }
+      
     },
     created() {
       this.page(1)

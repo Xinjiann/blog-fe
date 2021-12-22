@@ -3,10 +3,13 @@
     <Header></Header>
     <div class="mblog">
       <h2> {{ blog.title }}</h2>
-      <el-link icon="el-icon-edit" v-if="ownBlog">
+      <el-link icon="el-icon-edit" v-if="ownBlog||admin">
         <router-link :to="{name: 'BlogEdit', params: {blogId: blog.id}}" >
         编辑
         </router-link>
+      </el-link>
+      <el-link icon="el-icon-edit" v-if="ownBlog||admin" style="float: right;">
+        <span @click="deleteBlog()">删除</span>
       </el-link>
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
@@ -39,6 +42,7 @@
         },
         comments: [],
         ownBlog: false,
+        admin: false,
         createUserId: 0,
         createUserInfo: {
           name: "",
@@ -73,6 +77,7 @@
           var result = md.render(blog.content)
           this.blog.content = result
           this.ownBlog = (blog.userId === this.$store.getters.getUser.id)
+          console.log(blog.userId)
 
         })
         this.getUserInfo();
@@ -84,7 +89,16 @@
           this.createUserInfo.name = user.username;
           this.createUserInfo.avatar = user.avatar;
         });
-      }
+        this.admin = this.$store.getters.getUser.isAdmin === 1;
+      },
+
+      async deleteBlog(){
+        await this.$confirm('确定删除吗?');
+        this.$axios.get('/blog/delete/' + this.blog.id).then(res => {
+          this.$message('删除成功')
+          this.$router.go(-1)
+        });
+      },
     }
   }
 </script>
