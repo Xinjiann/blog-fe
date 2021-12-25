@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-container>
+    <el-container  style="width:45%; margin: 0 auto">
       <el-header>
         <img
           class="mlogo"
@@ -15,7 +15,7 @@
           ref="ruleForm"
           label-width="100px"
           class="demo-ruleForm"
-          style="width: 500px; margin-left: 170px"
+          style="width: 55%; margin-left: 19%"
         >
           <el-form-item label="用户名" prop="username">
             <el-input v-model="ruleForm.username"></el-input>
@@ -23,7 +23,7 @@
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="ruleForm.password"></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item style="width: 90%">
             <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
             <el-button @click="resetForm('ruleForm')">重置</el-button>
             <el-button @click="signUp">注册</el-button>

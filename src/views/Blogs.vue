@@ -1,11 +1,12 @@
 <template>
   <div class="mcontaner">
-    <Header></Header>
+    <Header @searchBlog="search"></Header>
 
-    <div class="block">
+    <div class="blogs">
+      
       <el-timeline>
 
-        <el-timeline-item :timestamp="blog.created" placement="top" v-for="blog in blogs" :key="blog.id">
+        <el-timeline-item v-bind:timestamp="blog.created" placement="top" v-for="blog in blogs" :key="blog.id">
           <el-card>
             <h4>
               <router-link :to="{name: 'BlogDetail', params: {blogId: blog.id}}">
@@ -43,7 +44,9 @@
         blogs: {},
         currentPage: 1,
         total: 0,
-        pageSize: 5
+        pageSize: 5,
+        currentPage2: 1,
+        input: '',
       }
     },
     methods: {
@@ -57,9 +60,19 @@
           console.log(res)
 
         })
+      },
+
+      search(input){
+        this.input = input;
+        this.$axios.post('blog/search', this.input).then(res => {
+          this.blogs = res.data.data;
+          console.log(input)
+        })
       }
       
     },
+
+  
     created() {
       this.page(1)
     }
@@ -71,6 +84,11 @@
   .mpage {
     margin: 0 auto;
     text-align: center;
+  }
+
+  .blogs {
+    width:55%;
+    margin: 0 auto;
   }
 
 </style>

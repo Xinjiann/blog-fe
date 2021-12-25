@@ -106,9 +106,10 @@
 <style scoped>
   .mblog {
     box-shadow: 0 2px 12px 0 rgba(5, 0, 0, 0.1);
-    width: 100%;
+    width:55%;
     min-height: 700px;
     padding: 20px 15px;
+    margin: 0 auto;
   }
 
 </style>

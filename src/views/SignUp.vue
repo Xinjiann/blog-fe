@@ -6,10 +6,11 @@
 
     <el-container>
       <el-header>欢迎注册</el-header>
-      <el-main>
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 400px; margin-left: 220px">
+      <el-main style="width:100%; margin-left: 0 auto">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 400px; margin-left: 35%">
           <el-form-item label="账号" prop="username">
-            <el-input v-model="ruleForm.username"></el-input>
+          <el-input v-model="ruleForm.username"></el-input>
+           <!-- placeholder="请输入账号" -->
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input v-model="ruleForm.password" autocomplete="off"></el-input>
@@ -49,7 +50,7 @@
 
       var validateUserName = (rule, value, callback) => {
         if (!value) {
-          callback(new Error('请输入昵账号'));
+          callback(new Error('请输入账号'));
         } else if(value.length<2){
           callback(new Error('账号长度至少2位'));
         }else{
