@@ -18,6 +18,8 @@
     "node-sass": "^4.14.1",
     "sass-loader": "^10.1.1",
     "vue": "^2.6.11",
+    "vue-calendar-heatmap": "^0.8.4",
+    "vue-contribution-calendar": "^0.2.0",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
   },

@@ -21,9 +21,11 @@
     
     <div class="comment" v-for="item in comments">
       <div class="info">
-        <img class="avatar" :src="item.userAvatar" width="36" height="36"/>
+        <img class="avatar" :src="item.userAvatar" width="36" height="36" @click="toProfile(item.createUser)" style="cursor: pointer"/>
         <div class="right">
-          <div class="name">{{item.createUser}}</div>
+          <div class="name">
+            <el-link @click="toProfile(item.createUser)">{{item.createUser}}</el-link>
+          </div>
           <div class="date">{{item.createTime}}</div>
         </div>
       </div>
@@ -41,7 +43,9 @@
       <div class="reply">
         <div class="item" v-for="reply in item.reply.replies">
           <div class="reply-content">
-            <span class="from-name">{{reply.createUser}}</span><span>: </span>
+            <span class="from-name">
+              <el-link @click="toProfile(reply.createUser)">{{reply.createUser}}</el-link>
+            </span><span>: </span>
             <!-- <span class="to-name">@{{reply.toName}}</span> -->
             <span>{{reply.content}}</span>
           </div>
@@ -99,6 +103,12 @@
     },
     computed: {},
     methods: {
+      toProfile(createUser) {
+        this.$axios.get('/user/getUserByName/'+createUser).then(res => {
+          const userId = res.data.data.id;
+          this.$router.push({ name: 'Profile', params: { id:  userId} })
+        })
+      },
       /**
        * 点赞
        */

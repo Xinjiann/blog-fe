@@ -2,27 +2,38 @@
   <div class="m-content">
     <h3>欢迎来到树洞博客</h3>
     <div class="block">
-      <el-avatar :size="50" :src="user.avatar"></el-avatar>
-      <div>{{ user.username }}</div>
+      <el-avatar @click.native="toProfile" :size="50" :src="user.avatar" style="cursor: pointer"></el-avatar>
+      <div>
+        <el-link @click.native="toProfile">@{{ user.username }}</el-link>
+      </div>
     </div>
 
-    <span class="maction">
-      
-      <!-- <span><el-link href="/blogs" style="margin-left:23.2%;">主页</el-link></span> -->
+    <span v-if="showSearch" class="maction" style="margin-left: 22.5%">
       <span><el-link href="/blogs">主页</el-link></span>
       <el-divider direction="vertical"></el-divider>
-      <span><el-link type="success" href="/blog/add">发表博客</el-link></span>
-
+      <span><el-link type="success" href="/blog/add">发表</el-link></span>
       <el-divider direction="vertical"></el-divider>
       <span v-show="!hasLogin"><el-link type="primary" href="/login">登录</el-link></span>
-
-      <!-- <span v-show="hasLogin"><el-link type="danger" @click="logout" style="margin-right:8%;">退出</el-link></span> -->
       <span v-show="hasLogin"><el-link type="danger" @click="logout">退出</el-link></span>
-
-      <!-- <span><el-input style="max-width: 250px;" v-model="input" placeholder="搜索文章" prefix-icon="el-icon-search" @keyup.enter.native="search"></el-input></span> -->
+      <el-divider direction="vertical"></el-divider>
+      <span><el-link @click="signUp">注册</el-link></span>      
     </span>
 
-    
+    <div v-else class="maction" style="margin-left: 0%">
+      <span><el-link href="/blogs">主页</el-link></span>
+      <el-divider direction="vertical"></el-divider>
+      <span><el-link type="success" href="/blog/add">发表</el-link></span>
+      <el-divider direction="vertical"></el-divider>
+      <span v-show="!hasLogin"><el-link type="primary" href="/login">登录</el-link></span>
+      <span v-show="hasLogin"><el-link type="danger" @click="logout">退出</el-link></span>
+      <el-divider direction="vertical"></el-divider>
+      <span><el-link @click="signUp">注册</el-link></span> 
+    </div>
+
+    <span v-show="showSearch">
+      <el-input style="max-width: 293px; margin-left: 5%" v-model="input" placeholder="搜索文章" prefix-icon="el-icon-search" @keyup.enter.native="search">
+      </el-input>
+    </span>
 
   </div>
 </template>
@@ -30,7 +41,7 @@
 <script>
   export default {
     name: "Header",
-    props: ['blogsPage'],
+    props: ['blogsPage', 'showSearch'],
     data() {
       return {
         user: {
@@ -42,6 +53,13 @@
       }
     },
     methods: {
+      toProfile(){
+        this.$router.push({ name: 'Profile', params: { id: this.$store.getters.getUser.id } })
+      },
+
+      signUp(){
+        this.$router.push("/signUp");
+      },
       search() {
         this.$emit("searchBlog", this.input)
       },

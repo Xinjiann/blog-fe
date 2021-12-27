@@ -2,7 +2,7 @@
   <div>
     <Header></Header>
 
-    <div class="m-content"  style="width:60%; margin:0 auto">
+    <div class="m-content"  style="width:60%; margin-left:17%">
 
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="标题" prop="title">
@@ -19,7 +19,7 @@
 
 
 
-        <el-form-item>
+        <el-form-item style="margin-right:3%;">
           <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
           <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
@@ -70,6 +70,9 @@
                 "Authorization": localStorage.getItem("token")
               }
             }).then(res => {
+              // 保存记录
+              const userId = this.$store.getters.getUser.id;
+              this.$axios.get('/records/add/'+ userId)
               _this.$alert('操作成功', '提示', {
                 confirmButtonText: '确定',
                 callback: action => {

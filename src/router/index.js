@@ -4,7 +4,8 @@ import Login from '../views/Login.vue'
 import Blogs from '../views/Blogs.vue'
 import BlogEdit from '../views/BlogEdit.vue'
 import BlogDetail from '../views/BlogDetail.vue'
-import SignUp from '../views/SignUp.vue';
+import SignUp from '../views/SignUp.vue'
+import Profile from '../views/Profile.vue'
 
 Vue.use(VueRouter)
 
@@ -43,7 +44,12 @@ const routes = [
     path: '/blog/:blogId/edit',
     name: 'BlogEdit',
     component: BlogEdit
-  }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
+  },
 ]
 const router = new VueRouter({
   mode: 'history',

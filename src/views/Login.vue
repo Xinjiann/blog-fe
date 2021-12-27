@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-container  style="width:45%; margin: 0 auto">
+    <el-container  style="width:100%; margin: 0 auto">
       <el-header>
         <img
           class="mlogo"
@@ -15,7 +15,7 @@
           ref="ruleForm"
           label-width="100px"
           class="demo-ruleForm"
-          style="width: 55%; margin-left: 19%"
+          style="width: 55%; margin-left: 33%"
         >
           <el-form-item label="用户名" prop="username">
             <el-input v-model="ruleForm.username"></el-input>
@@ -64,14 +64,10 @@ export default {
           const _this = this;
           this.$axios.post('/login', this.ruleForm).then(res => {
             const jwt = res.headers['authorization'];
-            console.log(res)
             const userInfo = res.data.data;
             // 把数据共享出去
             _this.$store.commit("SET_TOKEN", jwt)
             _this.$store.commit("SET_USERINFO", userInfo)
-
-            // 获取
-            console.log(_this.$store.getters.getUser)
 
             _this.$router.push("/blogs")
           });

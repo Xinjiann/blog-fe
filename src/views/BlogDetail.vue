@@ -24,7 +24,6 @@
 <script>
   import 'github-markdown-css'
   import Header from "../components/Header";
-  import * as CommentData from '../mockdata'
   import Comment from '../components/Comment'
 
   export default {
@@ -62,6 +61,7 @@
         }     
       })
       this.commentData = this.comments;
+
       
     },
     methods: {
@@ -77,8 +77,7 @@
           var result = md.render(blog.content)
           this.blog.content = result
           this.ownBlog = (blog.userId === this.$store.getters.getUser.id)
-          console.log(blog.userId)
-
+          console.log(this.blog)
         })
         this.getUserInfo();
       },
@@ -94,7 +93,11 @@
 
       async deleteBlog(){
         await this.$confirm('确定删除吗?');
-        this.$axios.get('/blog/delete/' + this.blog.id).then(res => {
+        this.$axios.get('/blog/delete/' + this.blog.id, {
+          headers: {
+            "Authorization": localStorage.getItem("token")
+          }
+        }).then(res => {
           this.$message('删除成功')
           this.$router.go(-1)
         });

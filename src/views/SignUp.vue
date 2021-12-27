@@ -119,7 +119,7 @@
             this.$axios.post('/signUp', this.ruleForm).then(res => {
               this.$alert('操作成功', '提示', {
                 callback: action => {
-                  this.$router.go(-1);
+                  this.$router.push("/login");
                 }
               });
             })

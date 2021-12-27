@@ -1,6 +1,6 @@
 <template>
   <div class="mcontaner">
-    <Header @searchBlog="search"></Header>
+    <Header @searchBlog="search" showSearch='true'></Header>
 
     <div class="blogs">
       
@@ -15,8 +15,14 @@
             </h4>
             <p>{{blog.description}}</p>
           </el-card>
+          
         </el-timeline-item>
 
+        <div v-if="blogs.length===0">
+          <br>
+          <el-card>无数据</el-card>
+          <br>
+        </div>
       </el-timeline>
 
       <el-pagination class="mpage"
@@ -57,17 +63,26 @@
           _this.currentPage = res.data.data.current
           _this.total = res.data.data.total
           _this.pageSize = res.data.data.size
-          console.log(res)
 
         })
       },
 
       search(input){
-        this.input = input;
-        this.$axios.post('blog/search', this.input).then(res => {
-          this.blogs = res.data.data;
-          console.log(input)
-        })
+        if(input===''){
+          this.page(1);
+        }else {
+          if(input==='%'){
+            input = '/%';
+          }
+          this.$axios.post('blog/search', input, {
+            headers: {
+              "Content-Type": "text/plain"
+            }
+          }).then(res => {
+            this.blogs = res.data.data;
+          })
+        }
+        
       }
       
     },
