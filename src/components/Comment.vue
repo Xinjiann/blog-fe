@@ -10,7 +10,8 @@
               type="textarea"
               :rows="3"
               autofocus
-              placeholder="写下你的评论">
+              placeholder="写下你的评论"
+              >
     </el-input>
     <br>
     <br>
@@ -68,7 +69,8 @@
                       type="textarea"
                       :rows="3"
                       autofocus
-                      placeholder="写下你的评论">
+                      placeholder="写下你的评论"
+                      >
             </el-input>
             <div class="btn-control">
               <span class="cancel" @click="cancel">取消</span>
@@ -138,6 +140,11 @@
        * 提交评论
        */
       commitComment(inputComment) {
+        if(inputComment===''){
+          this.$message('评论内容为空')
+          throw new Error('评论内容为空')
+        }
+
         const blogId = this.$route.params.blogId
         
         const commentForm = {

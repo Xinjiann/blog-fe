@@ -6,6 +6,7 @@ import BlogEdit from '../views/BlogEdit.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import SignUp from '../views/SignUp.vue'
 import Profile from '../views/Profile.vue'
+import Profile2 from '../views/Profile2.vue'
 
 Vue.use(VueRouter)
 
@@ -49,6 +50,11 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile
+  },
+  {
+    path: '/profile2',
+    name: 'Profile2',
+    component: Profile2
   },
 ]
 const router = new VueRouter({

@@ -1,37 +1,42 @@
 <template>
-  <div class="m-content">
+  <div>
     <el-page-header @back="goBack" content="个人主页">
-    </el-page-header>
-    
-    <div class="block">
-      <el-avatar :size="50" :src="user.avatar"></el-avatar>
-      <div style="font-size: 18px; color: dimgray">@{{ user.username }}</div>
-    </div><br><br>
+      </el-page-header>
+    <el-container>
+      <el-aside>
+          <el-avatar :size="50" :src="user.avatar"></el-avatar>
+          <div style="font-size: 18px; color: dimgray">@{{ user.username }}</div>
+      </el-aside>
 
-    <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br><br>
-    <div style="margin-right: 50.5%; font-size: 14px">Blogs</div>
-    <el-row :gutter="10" style="width: 55%; margin-left: 23%">
-      <el-col :span="8" v-for="blog in blogs" :key="blog.id">
-        <br>
-        <el-card style="height: 160px" shadow="hover" :body-style="{ padding: '17px' }">
-          <el-link @click="toBlog(blog.id)" style="color: #58A6FF; font-size: 11px; float:left; text-align: left">
-            {{ blog.title }}
-          </el-link><br><br>
-          <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
-          <br>
-          <div style="margin-right: 140px; bottom: 1px">{{blog.created}}</div>
-        </el-card>
-      </el-col>
-    </el-row><br><br><br>
+      <el-container>
+        <el-header>
+          <calendar-heatmap style="width: 50%" :endDate="today" :values="values"/><br><br>
+        </el-header>
 
-    <el-pagination class="mpage"
-                   background
-                   layout="prev, pager, next"
-                   :current-page="currentPage"
-                   :page-size="pageSize"
-                   :total="total"
-                   @current-change=page>
-    </el-pagination>
+        <el-main>
+          <div style="margin-right: 47%; font-size: 14px">Blogs</div>
+          <el-row :gutter="10" style="width: 50%; margin: 0 auto">
+            <el-col :span="8" v-for="blog in blogs" :key="blog.id">
+              <br>
+              <el-card style="height: 100px" shadow="hover">
+                <el-link @click="toBlog(blog.id)" style="color: #58A6FF; margin-left: 1px">
+                  {{ blog.title }}
+                </el-link>
+              </el-card>
+            </el-col>
+          </el-row><br>
+
+          <el-pagination class="mpage"
+                        background
+                        layout="prev, pager, next"
+                        :current-page="currentPage"
+                        :page-size="pageSize"
+                        :total="total"
+                        @current-change=page>
+          </el-pagination>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 

@@ -14,7 +14,16 @@
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
-      <Comment :comments="commentData" :createUserInfo="createUserInfo"></Comment>
+      <Comment :comments="commentData" :createUserInfo="createUserInfo"></Comment><br>
+
+      <el-pagination class="mpage"
+                     background
+                     layout="prev, pager, next"
+                     :current-page="currentPage"
+                     :page-size="pageSize"
+                     :total="total"
+                     @current-change=page>
+      </el-pagination>
 
     </div>
 
@@ -32,6 +41,10 @@
     components: {Header, Comment},
     data() {
       return {
+        blogId: 0,
+        total: 0,
+        pageSize: 5,
+        currentPage: 1,
         commentData: [],
         blog: {
           id: "",
@@ -50,21 +63,26 @@
       }
     },
     created() {
-      
-      const blogId = this.$route.params.blogId
-      this.getBlog(blogId);
-      this.$axios.get('/comment/' + blogId).then(res => {
-        const comments = res.data.data
-        for(let i=0; i<comments.length; i++){
-          let comment = comments[i];
-          this.comments.push(comment)
-        }     
-      })
-      this.commentData = this.comments;
-
+      this.blogId = this.$route.params.blogId;
+      this.getBlog(this.blogId);
+      this.page(1);
       
     },
     methods: {
+      page(currentPage){
+        this.comments = [];
+        this.$axios.get('/comment/' + this.blogId + "?currentPage=" + currentPage).then(res => {
+          const comments = res.data.data.records
+          for(let i=0; i<comments.length; i++){
+            let comment = comments[i];
+            this.comments.push(comment)
+          }     
+          this.currentPage = res.data.data.current
+          this.total = res.data.data.total
+          this.pageSize = res.data.data.size
+        })    
+        this.commentData = this.comments;
+      },
       async getBlog(blogId){
         await this.$axios.get('/blog/' + blogId).then(res => {
           const blog = res.data.data
@@ -77,7 +95,6 @@
           var result = md.render(blog.content)
           this.blog.content = result
           this.ownBlog = (blog.userId === this.$store.getters.getUser.id)
-          console.log(this.blog)
         })
         this.getUserInfo();
       },

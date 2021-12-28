@@ -2,7 +2,7 @@
   <div>
     <Header></Header>
 
-    <div class="m-content"  style="width:60%; margin-left:17%">
+    <div class="m-content"  style="width:60%; margin-left:18%">
 
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="标题" prop="title">
