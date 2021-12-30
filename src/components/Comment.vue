@@ -139,50 +139,55 @@
        * 提交评论
        */
       commitComment(inputComment) {
-        if(inputComment===''){
-          this.$message('评论内容不能为空')
-          throw new Error('评论内容不能为空')
-        }
-
-        if(typeof this.$route.params.id === 'undefined'){
+        
+        if(!this.$store.getters.getUser.id){
           this.$message('请先登录')
-          throw new Error('请先登陆')
-        }
-
-        const blogId = this.$route.params.blogId
-        
-        const commentForm = {
-          blogId: blogId,
-          createUser: this.userInfo.username,
-          userAvatar: this.userInfo.avatar,
-          content: inputComment,
-        }
-        this.$axios.post('/comment/comment', commentForm).then(res => {
-          this.$alert('操作成功', '提示', {
-            callback: action => {
-              this.$router.go(0);
+        } else {
+          if(inputComment===''){
+            this.$message('评论内容不能为空')
+          }else {
+            const blogId = this.$route.params.blogId
+            const commentForm = {
+              blogId: blogId,
+              createUser: this.userInfo.username,
+              content: inputComment,
             }
-          });
-        })
-        
+            console.log(commentForm)
+            this.$axios.post('/comment/comment', commentForm).then(res => {
+              this.$alert('操作成功', '提示', {
+                callback: action => {
+                  this.$router.go(0);
+                }
+              });
+            })
+          }
+        }
       },
 
       commitReply(commentId, inputComment) {
-        const replyForm = {
-          commentId: commentId,
-          content: inputComment,
-          createUser: this.userInfo.username,
-          userAvatar: this.userInfo.avatar,
-        }
-      this.$axios.post('/comment/reply', replyForm).then(res => {
-          this.$alert('操作成功', '提示', {
-            callback: action => {
-              this.$router.go(0);
+        console.log(commentId)
+        if(!this.$store.getters.getUser.id){
+          this.$message('请先登录')
+        } else {
+          if(inputComment===''){
+            this.$message('回复内容不能为空')
+          }else {
+            const replyForm = {
+              commentId: commentId,
+              content: inputComment,
+              createUser: this.userInfo.username,
+              userAvatar: this.userInfo.avatar,
             }
-          });
-        })
-
-
+            console.log(replyForm)
+            this.$axios.post('/comment/reply', replyForm).then(res => {
+              this.$alert('操作成功', '提示', {
+                callback: action => {
+                  this.$router.go(0);
+                }
+              });
+            })
+          }
+        }
       },
 
 

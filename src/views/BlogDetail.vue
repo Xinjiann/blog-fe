@@ -85,8 +85,6 @@
             });
             this.comments.push(comment)
           }
-          console.log(this.comments)
-
           this.currentPage = res.data.data.current
           this.total = res.data.data.total
           this.pageSize = res.data.data.size
@@ -117,7 +115,12 @@
           this.createUserInfo.name = user.username;
           this.createUserInfo.avatar = user.avatar;
         });
-        this.admin = this.$store.getters.getUser.isAdmin === 1;
+        if (this.$store.getters.getUser.id) {
+          this.$axios.get('/user/getUser/' + this.$store.getters.getUser.id).then(res => {
+            const storeUser = res.data.data;
+            this.admin = storeUser.isAdmin === 9866;   
+          });
+        }
       },
 
       async deleteBlog(){

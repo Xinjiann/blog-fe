@@ -7,6 +7,7 @@
     
     <span class="block">
       <el-upload 
+        v-if="admin === 9866 || user.id === storeUserId"
         action="http://localhost:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
@@ -14,24 +15,18 @@
         :show-file-list="false">
         <el-avatar :size="50" :src="user.avatar"></el-avatar>
       </el-upload>
+      <div v-else>
+        <el-avatar :size="50" :src="user.avatar"></el-avatar>
+      </div>
       <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2%">@{{ user.username }}</span>
       <span v-else style="font-size: 18px; color: dimgray">@{{ user.username }}</span>
     </span>
-    <el-link v-show="hasLogin" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray">编辑</el-link>
+    <el-link v-show="hasLogin" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray" >编辑</el-link>
     
     <br>
     <div v-show="!edit"><br></div>
 
     <div v-show="edit">
-      <!-- <el-upload
-        class="avatar-uploader"
-        action="https://jsonplaceholder.typicode.com/posts/"
-        :show-file-list="false"
-        :on-success="handleAvatarSuccess"
-        :before-upload="beforeAvatarUpload">
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <el-button size="mini" type="primary">上传头像</el-button>
-      </el-upload> -->
       <h1 style="margin-right: 11.8%; font-size: 13px; line-height: 6px">Name</h1>
       <el-input v-model="input" placeholder="请输入内容" style="width: 14%; margin: 0 auto" size="small"></el-input>
       <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
@@ -76,6 +71,7 @@
     },
     data() {
       return {
+        admin: 0,
         userId: '',
         avatar: '',
         extraData: {
@@ -98,9 +94,11 @@
         currentPage: 1,
         today: new Date(),
         user: {
+          id: 0,
           username: '游客',
-          avatar: ''
+          avatar: '',
         },
+        storeUserId: '',
         hasLogin: false,
         input: '',
         days: [],
@@ -111,7 +109,7 @@
     },
     methods: {
       beforeAvatarUpload(item){
-        if(!this.$store.getters.getUser.username){
+        if(!this.$store.getters.getUser.id){
           this.$message.error("请先登陆")
         }else {
           const isJPG = item.type === 'image/jpeg' || item.type === 'image/png';
@@ -128,7 +126,11 @@
         this.initUser();
       },
       showEdit(){
-        this.edit = !this.edit;
+        if (this.$store.getters.getUser.id != this.user.id){
+          this.$message("非本人")
+        } else {
+          this.edit = !this.edit;
+        }
       },
       cancleEdit() {
         this.edit = false;
@@ -148,22 +150,38 @@
         this.$router.go(-1);
       },
       async initUser() {
-        if(this.$store.getters.getUser.username) {
-          this.userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
-          await this.$axios.get("/user/getUser/" + this.userId).then(res => {
-            this.user.username = res.data.data.username;
-            this.avatar = res.data.data.avatar;
-            
-          });
-          if(this.avatar != '') {
-            this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
-              this.user.avatar = res.data.data;
-            })
+        if (typeof this.$route.params.id != 'undefined') {
+          this.userId = this.$route.params.id;
+        } else {
+          if (this.$store.getters.getUser.id) {
+            this.userId = this.$store.getters.getUser.id
           }
-          this.hasLogin = true;
-          this.initBlogs();
-          this.getRecord();
+          else {
+            throw new Error("请先登陆")
+          }
         }
+
+        await this.$axios.get("/user/getUser/" + this.userId).then(res => {
+          this.user.id = res.data.data.id;
+          this.user.username = res.data.data.username;
+          this.avatar = res.data.data.avatar;
+        });
+        if(this.avatar != '') {
+          this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
+            this.user.avatar = res.data.data;
+          })
+        }
+
+        if (this.$store.getters.getUser.id) {
+          this.storeUserId = this.$store.getters.getUser.id;
+          await this.$axios.get("/user/getUser/" + this.$store.getters.getUser.id).then(res => {
+            this.admin = res.data.data.isAdmin;
+          });      
+        }
+        this.hasLogin = true;
+        this.initBlogs();
+        this.getRecord();
+        
       },
       initBlogs(){
         this.$axios.get("/blogsByUserId/" + this.userId + '?currentPage=' + this.currentPage).then(res => {
