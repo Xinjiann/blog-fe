@@ -2,14 +2,46 @@
   <div class="m-content">
     <el-page-header @back="goBack" content="个人主页">
     </el-page-header>
-    
-    <div class="block">
-      <el-avatar :size="50" :src="user.avatar"></el-avatar>
-      <div style="font-size: 18px; color: dimgray">@{{ user.username }}</div>
-    </div><br><br>
 
-    <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br><br>
-    <div style="margin-right: 50.5%; font-size: 14px">Blogs</div>
+    <h3>欢迎来到树洞博客</h3><br>
+    
+    <span class="block">
+      <el-upload 
+        action="http://localhost:8081/file/upload"
+        :data="extraData"
+        :before-upload="beforeAvatarUpload"
+        :on-success="success"
+        :show-file-list="false">
+        <el-avatar :size="50" :src="user.avatar"></el-avatar>
+      </el-upload>
+      <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2%">@{{ user.username }}</span>
+      <span v-else style="font-size: 18px; color: dimgray">@{{ user.username }}</span>
+    </span>
+    <el-link v-show="hasLogin" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray">编辑</el-link>
+    
+    <br>
+    <div v-show="!edit"><br></div>
+
+    <div v-show="edit">
+      <!-- <el-upload
+        class="avatar-uploader"
+        action="https://jsonplaceholder.typicode.com/posts/"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload">
+        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+        <el-button size="mini" type="primary">上传头像</el-button>
+      </el-upload> -->
+      <h1 style="margin-right: 11.8%; font-size: 13px; line-height: 6px">Name</h1>
+      <el-input v-model="input" placeholder="请输入内容" style="width: 14%; margin: 0 auto" size="small"></el-input>
+      <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
+      <el-input v-model="input" placeholder="请输入内容" style="width: 14%" size="large"></el-input><br><br>
+      <el-button size="mini" type="primary">确定</el-button>
+      <el-button size="mini" @click="cancleEdit">取消</el-button><br><br>
+    </div>
+
+    <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br>
+    <h3 style="margin-right: 50.5%; font-size: 14px">Blogs</h3>
     <el-row :gutter="10" style="width: 55%; margin-left: 23%">
       <el-col :span="8" v-for="blog in blogs" :key="blog.id">
         <br>
@@ -19,7 +51,7 @@
           </el-link><br><br>
           <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
           <br>
-          <div style="margin-right: 140px; bottom: 1px">{{blog.created}}</div>
+          <div style="margin-right: 138px; bottom: 1px">{{blog.created}}</div>
         </el-card>
       </el-col>
     </el-row><br><br><br>
@@ -44,12 +76,30 @@
     },
     data() {
       return {
+        userId: '',
+        avatar: '',
+        extraData: {
+          id: 0
+        },
+        edit: false,
+        hasLogin: false,
+        imageUrl: '',
+        form: {
+          name: '',
+          region: '',
+          date1: '',
+          date2: '',
+          delivery: false,
+          type: [],
+          resource: '',
+          desc: ''
+        },
         values: [],
         currentPage: 1,
         today: new Date(),
         user: {
-          username: '请先登录',
-          avatar: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.cwq.com%2F201712%2F1513090030590881.jpeg&refer=http%3A%2F%2Fimg.cwq.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641122100&t=ab3415d9c369021a9e836e22362b0122'
+          username: '游客',
+          avatar: ''
         },
         hasLogin: false,
         input: '',
@@ -60,7 +110,29 @@
       }
     },
     methods: {
-
+      beforeAvatarUpload(item){
+        if(!this.$store.getters.getUser.username){
+          this.$message.error("请先登陆")
+        }else {
+          const isJPG = item.type === 'image/jpeg' || item.type === 'image/png';
+          if (!isJPG) {
+            this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
+            return isJPG
+          }
+          const userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
+          this.extraData.id = userId;
+        }
+      },
+      success(){
+        this.$message("头像上传成功")
+        this.initUser();
+      },
+      showEdit(){
+        this.edit = !this.edit;
+      },
+      cancleEdit() {
+        this.edit = false;
+      },
       page(currentPage) {
         const userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
         this.$axios.get("/blogsByUserId/" + userId + '?currentPage=' + currentPage).then(res => {
@@ -69,24 +141,32 @@
           this.pageSize = res.data.data.size;
         })
       },
-
       toBlog(id) {
         this.$router.push({name: 'BlogDetail', params: {blogId: id}});
       },
       goBack() {
         this.$router.go(-1);
       },
-
-      initUser() {
-        const userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
-        this.$axios.get("/user/getUser/" + userId).then(res => {
-          this.user.username = res.data.data.username;
-          this.user.avatar = res.data.data.avatar;
-        });
-        this.initBlogs(userId);
+      async initUser() {
+        if(this.$store.getters.getUser.username) {
+          this.userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
+          await this.$axios.get("/user/getUser/" + this.userId).then(res => {
+            this.user.username = res.data.data.username;
+            this.avatar = res.data.data.avatar;
+            
+          });
+          if(this.avatar != '') {
+            this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
+              this.user.avatar = res.data.data;
+            })
+          }
+          this.hasLogin = true;
+          this.initBlogs();
+          this.getRecord();
+        }
       },
-      initBlogs(userId){
-        this.$axios.get("/blogsByUserId/" + userId + '?currentPage=' + this.currentPage).then(res => {
+      initBlogs(){
+        this.$axios.get("/blogsByUserId/" + this.userId + '?currentPage=' + this.currentPage).then(res => {
           this.blogs = res.data.data.records;
           this.total = res.data.data.total;
           this.pageSize = res.data.data.size;
@@ -112,8 +192,7 @@
       },
 
       getRecord(){
-        const userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
-        this.$axios.get("/records/" + userId).then(res => {
+        this.$axios.get("/records/" + this.userId).then(res => {
           res.data.data.forEach(i => {
             this.values.push({
               date: i.date,
@@ -125,14 +204,6 @@
     },
     created() {
       this.initUser();
-
-      this.getRecord();
-
-    
-
-
-      
-
     }
   }
 </script>
@@ -167,6 +238,29 @@
   .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+  }
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 
 </style>

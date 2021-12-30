@@ -44,15 +44,28 @@
     props: ['blogsPage', 'showSearch'],
     data() {
       return {
+        avatar: '',
         user: {
-          username: '请先登录',
-          avatar: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.cwq.com%2F201712%2F1513090030590881.jpeg&refer=http%3A%2F%2Fimg.cwq.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641122100&t=ab3415d9c369021a9e836e22362b0122'
+          username: '游客',
+          avatar: ''
         },
         hasLogin: false,
         input: '',
       }
     },
     methods: {
+      async initUser(){
+        if(this.$store.getters.getUser.username) {
+          this.user.username = this.$store.getters.getUser.username
+          await this.$axios.get('/user/getUserByName/'+this.user.username).then(res => {
+            this.avatar = res.data.data.avatar
+          })
+          this.hasLogin = true
+          this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
+            this.user.avatar = res.data.data;
+          })
+        }
+      },
       toProfile(){
         this.$router.push({ name: 'Profile', params: { id: this.$store.getters.getUser.id } })
       },
@@ -77,13 +90,7 @@
       }
     },
     created() {
-      if(this.$store.getters.getUser.username) {
-        this.user.username = this.$store.getters.getUser.username
-        this.user.avatar = this.$store.getters.getUser.avatar
-
-        this.hasLogin = true
-      }
-
+      this.initUser();
     }
   }
 </script>

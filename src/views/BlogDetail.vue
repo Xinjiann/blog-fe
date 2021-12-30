@@ -14,7 +14,7 @@
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
-      <Comment :comments="commentData" :createUserInfo="createUserInfo"></Comment><br>
+      <Comment :comments="comments"></Comment><br>
 
       <el-pagination class="mpage"
                      background
@@ -45,7 +45,6 @@
         total: 0,
         pageSize: 5,
         currentPage: 1,
-        commentData: [],
         blog: {
           id: "",
           title: "",
@@ -72,16 +71,29 @@
       page(currentPage){
         this.comments = [];
         this.$axios.get('/comment/' + this.blogId + "?currentPage=" + currentPage).then(res => {
-          const comments = res.data.data.records
-          for(let i=0; i<comments.length; i++){
-            let comment = comments[i];
+          for (let i=0; i<res.data.data.length; i++){
+            let comment = res.data.data[i]
+            this.$axios.get('/user/getUserByName/'+comment.createUser).then(res => {
+              let avatar =  res.data.data.avatar;
+              if(avatar != '') {
+                this.$axios.get("/file/getUrl/"+avatar).then(res =>{
+                  comment.userAvatar = res.data.data;
+                })
+              }else {
+                comment = ''
+              }
+            });
             this.comments.push(comment)
-          }     
+          }
+          console.log(this.comments)
+
           this.currentPage = res.data.data.current
           this.total = res.data.data.total
           this.pageSize = res.data.data.size
+          
         })    
-        this.commentData = this.comments;
+        
+        
       },
       async getBlog(blogId){
         await this.$axios.get('/blog/' + blogId).then(res => {

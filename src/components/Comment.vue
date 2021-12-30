@@ -93,7 +93,6 @@
         type: Array,
         required: true
       },
-      createUserInfo: Object,
     },
     components: {},
     data() {
@@ -141,8 +140,13 @@
        */
       commitComment(inputComment) {
         if(inputComment===''){
-          this.$message('评论内容为空')
-          throw new Error('评论内容为空')
+          this.$message('评论内容不能为空')
+          throw new Error('评论内容不能为空')
+        }
+
+        if(typeof this.$route.params.id === 'undefined'){
+          this.$message('请先登录')
+          throw new Error('请先登陆')
         }
 
         const blogId = this.$route.params.blogId
