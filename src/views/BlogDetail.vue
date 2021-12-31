@@ -71,8 +71,8 @@
       page(currentPage){
         this.comments = [];
         this.$axios.get('/comment/' + this.blogId + "?currentPage=" + currentPage).then(res => {
-          for (let i=0; i<res.data.data.length; i++){
-            let comment = res.data.data[i]
+          for (let i=0; i<res.data.data.records.length; i++){
+            let comment = res.data.data.records[i]
             this.$axios.get('/user/getUserByName/'+comment.createUser).then(res => {
               let avatar =  res.data.data.avatar;
               if(avatar != '') {
