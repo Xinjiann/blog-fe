@@ -69,9 +69,12 @@
             this.avatar = res.data.data.avatar
           })
           this.hasLogin = true
-          this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
-            this.user.avatar = res.data.data;
-          })
+          if (this.avatar != '') {
+            this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
+              this.user.avatar = res.data.data;
+            })
+          }
+
         }
       },
       toProfile(){

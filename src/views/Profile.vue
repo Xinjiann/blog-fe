@@ -28,11 +28,11 @@
 
     <div v-show="edit">
       <h1 style="margin-right: 11.8%; font-size: 13px; line-height: 6px">Name</h1>
-      <el-input v-model="input" placeholder="请输入内容" style="width: 14%; margin: 0 auto" size="small"></el-input>
-      <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
-      <el-input v-model="input" placeholder="请输入内容" style="width: 14%" size="large"></el-input><br><br>
-      <el-button size="mini" type="primary">确定</el-button>
-      <el-button size="mini" @click="cancleEdit">取消</el-button><br><br>
+      <el-input v-model="inputUsername" placeholder="用户名" style="width: 14%; margin: 0 auto" size="small" @keyup.enter.native="editUsername"></el-input><br><br>
+      <!-- <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
+      <el-input v-model="input" placeholder="请输入内容" style="width: 14%" size="large"></el-input><br><br> -->
+      <!-- <el-button size="mini" type="primary">确定</el-button>
+      <el-button size="mini" @click="cancleEdit">取消</el-button><br><br> -->
     </div>
 
     <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br>
@@ -46,7 +46,7 @@
           </el-link><br><br>
           <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
           <br>
-          <div style="margin-right: 138px; bottom: 1px">{{blog.created}}</div>
+          <div style="margin-right: 138px; bottom: 1px; color: gray;">{{blog.created}}</div>
         </el-card>
       </el-col>
     </el-row><br><br><br>
@@ -71,6 +71,7 @@
     },
     data() {
       return {
+        inputUsername: '',
         admin: 0,
         userId: '',
         avatar: '',
@@ -79,17 +80,6 @@
         },
         edit: false,
         hasLogin: false,
-        imageUrl: '',
-        form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
-        },
         values: [],
         currentPage: 1,
         today: new Date(),
@@ -108,6 +98,23 @@
       }
     },
     methods: {
+      editUsername() {
+        if(this.inputUsername.length<2){
+          this.$message.error("账号长度至少两位")
+        } else {
+          const userId = this.$route.params.id ? this.$route.params.id : this.$store.getters.getUser.id;
+          this.$axios.get("/user/editUsername/" + userId + "?username=" + this.inputUsername).then(res => {
+            this.$alert('修改成功', '提示', {
+              callback: action => {
+                const userInfo = this.$store.getters.getUser;
+                userInfo.username = this.inputUsername
+                this.$store.commit("SET_USERINFO", userInfo)
+                this.$router.go(0);
+              }
+            });
+          })
+        }
+      },
       beforeAvatarUpload(item){
         if(!this.$store.getters.getUser.id){
           this.$message.error("请先登陆")
@@ -156,32 +163,31 @@
           if (this.$store.getters.getUser.id) {
             this.userId = this.$store.getters.getUser.id
           }
-          else {
-            throw new Error("请先登陆")
+        }
+
+        if (this.userId) {
+          await this.$axios.get("/user/getUser/" + this.userId).then(res => {
+            this.user.id = res.data.data.id;
+            this.user.username = res.data.data.username;
+            this.avatar = res.data.data.avatar;
+            this.inputUsername = this.user.username;
+          });
+          if(this.avatar != '') {
+            this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
+              this.user.avatar = res.data.data;
+            })
           }
-        }
 
-        await this.$axios.get("/user/getUser/" + this.userId).then(res => {
-          this.user.id = res.data.data.id;
-          this.user.username = res.data.data.username;
-          this.avatar = res.data.data.avatar;
-        });
-        if(this.avatar != '') {
-          this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
-            this.user.avatar = res.data.data;
-          })
-        }
-
-        if (this.$store.getters.getUser.id) {
-          this.storeUserId = this.$store.getters.getUser.id;
-          await this.$axios.get("/user/getUser/" + this.$store.getters.getUser.id).then(res => {
-            this.admin = res.data.data.isAdmin;
-          });      
-        }
-        this.hasLogin = true;
-        this.initBlogs();
-        this.getRecord();
-        
+          if (this.$store.getters.getUser.id) {
+            this.storeUserId = this.$store.getters.getUser.id;
+            await this.$axios.get("/user/getUser/" + this.$store.getters.getUser.id).then(res => {
+              this.admin = res.data.data.isAdmin;
+            });      
+          }
+          this.hasLogin = true;
+          this.initBlogs();
+          this.getRecord();
+        } 
       },
       initBlogs(){
         this.$axios.get("/blogsByUserId/" + this.userId + '?currentPage=' + this.currentPage).then(res => {

@@ -3,14 +3,20 @@
     <Header></Header>
     <div class="mblog">
       <h2> {{ blog.title }}</h2>
-      <el-link icon="el-icon-edit" v-if="ownBlog||admin">
-        <router-link :to="{name: 'BlogEdit', params: {blogId: blog.id}}" >
-        编辑
-        </router-link>
-      </el-link>
-      <el-link icon="el-icon-edit" v-if="ownBlog||admin" style="float: right;">
-        <span @click="deleteBlog()">删除</span>
-      </el-link>
+      <span style="font-size: 14px; color: #626567;">作者：</span>
+      <span class="span-line" style="font-size: 14px; color: #626567; cursor: pointer" @click="toProfile">{{createUserInfo.name}}</span>
+      <span style="font-size: 14px; color: #626567; float: right">{{blog.createTime}}</span><br>
+      <div v-if="ownBlog||admin">
+        <br>
+        <el-link icon="el-icon-edit">
+          <router-link :to="{name: 'BlogEdit', params: {blogId: blog.id}}" >
+          编辑
+          </router-link>
+        </el-link>
+        <el-link icon="el-icon-edit" style="float: right;">
+          <span @click="deleteBlog()">删除</span>
+        </el-link>
+      </div>
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
@@ -50,6 +56,7 @@
           title: "",
           content: "",
           createUser: "",
+          createTime: "",
         },
         comments: [],
         ownBlog: false,
@@ -68,13 +75,18 @@
       
     },
     methods: {
+      toProfile(){
+        this.$router.push({name: "Profile", params: {id: this.createUserId}})
+      },
       page(currentPage){
         this.comments = [];
         this.$axios.get('/comment/' + this.blogId + "?currentPage=" + currentPage).then(res => {
+
           for (let i=0; i<res.data.data.records.length; i++){
             let comment = res.data.data.records[i]
-            this.$axios.get('/user/getUserByName/'+comment.createUser).then(res => {
+            this.$axios.get('/user/getUser/'+comment.createUserId).then(res => {
               let avatar =  res.data.data.avatar;
+              comment.createUser = res.data.data.username;
               if(avatar != '') {
                 this.$axios.get("/file/getUrl/"+avatar).then(res =>{
                   comment.userAvatar = res.data.data;
@@ -99,6 +111,7 @@
           this.blog.id = blog.id
           this.blog.title = blog.title
           this.createUserId = blog.userId;
+          this.blog.createTime = blog.created;
           var MardownIt = require("markdown-it")
           var md = new MardownIt()
 
@@ -145,6 +158,9 @@
     min-height: 700px;
     padding: 20px 15px;
     margin: 0 auto;
+  }
+  .span-line:hover{
+    text-decoration:underline;
   }
 
 </style>

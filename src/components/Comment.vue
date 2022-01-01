@@ -22,10 +22,10 @@
     
     <div class="comment" v-for="item in comments">
       <div class="info">
-        <img class="avatar" :src="item.userAvatar" width="36" height="36" @click="toProfile(item.createUser)" style="cursor: pointer"/>
+        <img class="avatar" :src="item.userAvatar" width="36" height="36" @click="toProfile(item.createUserId)" style="cursor: pointer"/>
         <div class="right">
           <div class="name">
-            <el-link @click="toProfile(item.createUser)">{{item.createUser}}</el-link>
+            <el-link @click="toProfile(item.createUserId)">{{item.createUser}}</el-link>
           </div>
           <div class="date">{{item.createTime}}</div>
         </div>
@@ -45,7 +45,7 @@
         <div class="item" v-for="reply in item.reply.replies">
           <div class="reply-content">
             <span class="from-name">
-              <el-link @click="toProfile(reply.createUser)">{{reply.createUser}}</el-link>
+              <el-link @click="toProfileByname(reply.createUser)">{{reply.createUser}}</el-link>
             </span><span>: </span>
             <!-- <span class="to-name">@{{reply.toName}}</span> -->
             <span>{{reply.content}}</span>
@@ -105,6 +105,12 @@
     computed: {},
     methods: {
       toProfile(createUser) {
+        this.$axios.get('/user/getUser/'+createUser).then(res => {
+          const userId = res.data.data.id;
+          this.$router.push({ name: 'Profile', params: { id:  userId} })
+        })
+      },
+      toProfileByname(createUser){
         this.$axios.get('/user/getUserByName/'+createUser).then(res => {
           const userId = res.data.data.id;
           this.$router.push({ name: 'Profile', params: { id:  userId} })
@@ -151,8 +157,8 @@
               blogId: blogId,
               createUser: this.userInfo.username,
               content: inputComment,
+              createUserId: this.userInfo.id,
             }
-            console.log(commentForm)
             this.$axios.post('/comment/comment', commentForm).then(res => {
               this.$alert('操作成功', '提示', {
                 callback: action => {
@@ -178,7 +184,6 @@
               createUser: this.userInfo.username,
               userAvatar: this.userInfo.avatar,
             }
-            console.log(replyForm)
             this.$axios.post('/comment/reply', replyForm).then(res => {
               this.$alert('操作成功', '提示', {
                 callback: action => {
