@@ -20,7 +20,7 @@
     <br>
     <br>
     
-    <div class="comment" v-for="item in comments">
+    <div class="comment" v-for="item in comments" :key="item.id">
       <div class="info">
         <img class="avatar" :src="item.userAvatar" width="36" height="36" @click="toProfile(item.createUserId)" style="cursor: pointer"/>
         <div class="right">

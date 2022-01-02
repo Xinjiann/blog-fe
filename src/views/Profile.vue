@@ -8,15 +8,16 @@
     <span class="block">
       <el-upload 
         v-if="admin === 9866 || user.id === storeUserId"
-        action="http://localhost:8081/file/upload"
+        action="http://47.104.92.236:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
         :on-success="success"
         :show-file-list="false">
-        <el-avatar :size="50" :src="user.avatar"></el-avatar>
+        <el-avatar :size="65" :src="user.avatar"></el-avatar>
+        <!-- <img class="avatar" :src="user.avatar" width="100" height="100" style="cursor: pointer; border-radius: 50%; border-bottom: 1px;"/> -->
       </el-upload>
       <div v-else>
-        <el-avatar :size="50" :src="user.avatar"></el-avatar>
+        <el-avatar :size="65" :src="user.avatar"></el-avatar>
       </div>
       <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2%">@{{ user.username }}</span>
       <span v-else style="font-size: 18px; color: dimgray">@{{ user.username }}</span>
@@ -86,7 +87,7 @@
         user: {
           id: 0,
           username: '游客',
-          avatar: '',
+          avatar: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1',
         },
         storeUserId: '',
         hasLogin: false,
@@ -176,6 +177,8 @@
             this.$axios.get("/file/getUrl/"+this.avatar).then(res =>{
               this.user.avatar = res.data.data;
             })
+          } else {
+            this.user.avatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
           }
 
           if (this.$store.getters.getUser.id) {

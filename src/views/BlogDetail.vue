@@ -91,8 +91,8 @@
                 this.$axios.get("/file/getUrl/"+avatar).then(res =>{
                   comment.userAvatar = res.data.data;
                 })
-              }else {
-                comment = ''
+              } else {
+                comment.userAvatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
               }
             });
             this.comments.push(comment)
