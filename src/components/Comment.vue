@@ -171,7 +171,6 @@
       },
 
       commitReply(commentId, inputComment) {
-        console.log(commentId)
         if(!this.$store.getters.getUser.id){
           this.$message('请先登录')
         } else {

@@ -22,7 +22,7 @@
     <div v-else class="maction" style="margin-left: 0%">
       <span><el-link href="/blogs">主页</el-link></span>
       <el-divider direction="vertical"></el-divider>
-      <span><el-link type="success" href="/blog/add">发表</el-link></span>
+      <span><el-link type="success" @click="addBlog">发表</el-link></span>
       <el-divider direction="vertical"></el-divider>
       <span v-show="!hasLogin"><el-link type="primary" href="/login">登录</el-link></span>
       <span v-show="hasLogin"><el-link type="danger" @click="logout">退出</el-link></span>

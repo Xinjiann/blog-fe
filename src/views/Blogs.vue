@@ -1,7 +1,7 @@
-<template>
+<template >
   <div class="mcontaner">
+    <vue-canvas-nest :config="config"></vue-canvas-nest>
     <Header @searchBlog="search" showSearch='true'></Header>
-
     <div class="blogs">
       
       <el-timeline>
@@ -41,12 +41,18 @@
 
 <script>
   import Header from "../components/Header";
-
+  import vueCanvasNest from "vue-canvas-nest";
   export default {
     name: "Blogs.vue",
-    components: {Header},
+    components: {Header, vueCanvasNest},
     data() {
       return {
+        config: {
+          color: "255,0,0",
+          opacity: 1.3,
+          zIndex: 55,
+          count: 120,
+        },
         blogs: {},
         currentPage: 1,
         total: 0,
@@ -57,6 +63,9 @@
     },
     methods: {
       page(currentPage) {
+        if(!this.$store.getters.getUser){
+          this.$store.commit("REMOVE_INFO")
+        }
         const _this = this
         _this.$axios.get("/blogs?currentPage=" + currentPage).then(res => {
           _this.blogs = res.data.data.records

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <vue-canvas-nest :config="config"></vue-canvas-nest> -->
     <Header></Header>
     <div class="mblog">
       <h2> {{ blog.title }}</h2>
@@ -40,13 +41,20 @@
   import 'github-markdown-css'
   import Header from "../components/Header";
   import Comment from '../components/Comment'
+  import vueCanvasNest from "vue-canvas-nest";
 
   export default {
 
     name: "BlogDetail.vue",
-    components: {Header, Comment},
+    components: {Header, Comment, vueCanvasNest},
     data() {
       return {
+        config: {
+          color: "255,0,0",
+          opacity: 1.3,
+          zIndex: -100000,
+          count: 150,
+        },
         blogId: 0,
         total: 0,
         pageSize: 5,

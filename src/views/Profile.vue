@@ -1,5 +1,6 @@
 <template>
   <div class="m-content">
+    <vue-canvas-nest :config="config"></vue-canvas-nest>
     <el-page-header @back="goBack" content="个人主页">
     </el-page-header>
 
@@ -65,13 +66,21 @@
 
 <script>
   import { CalendarHeatmap } from 'vue-calendar-heatmap'
+  import vueCanvasNest from "vue-canvas-nest";
   import _ from 'lodash';
   export default {
     components: {
-      CalendarHeatmap
+      CalendarHeatmap,
+      vueCanvasNest,
     },
     data() {
       return {
+        config: {
+          color: "255,0,0",
+          opacity: 1.3,
+          zIndex: 55,
+          count: 88,
+        },
         inputUsername: '',
         admin: 0,
         userId: '',

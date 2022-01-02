@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "bright-comment": "^1.5.7",
+    "canvas-nest.js": "^2.0.4",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "github-markdown-css": "^5.1.0",
@@ -19,6 +20,7 @@
     "sass-loader": "^10.1.1",
     "vue": "^2.6.11",
     "vue-calendar-heatmap": "^0.8.4",
+    "vue-canvas-nest": "^2.0.0",
     "vue-contribution-calendar": "^0.2.0",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
