@@ -152,6 +152,8 @@
           }
         }).then(res => {
           this.$message('删除成功')
+          // 保存记录
+          this.$axios.get('/records/add/'+ this.$store.getters.getUser.id + '?type=deleteBlog')
           this.$router.go(-1)
         });
       },

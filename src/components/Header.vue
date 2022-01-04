@@ -31,7 +31,7 @@
     </div>
 
     <span v-show="showSearch">
-      <el-input style="max-width: 293px; margin-left: 5%" v-model="input" placeholder="搜索文章" prefix-icon="el-icon-search" @keyup.enter.native="search">
+      <el-input style="width: 17%; margin-left: 5.5%" v-model="input" placeholder="搜索文章" prefix-icon="el-icon-search" @keyup.enter.native="search">
       </el-input>
     </span>
 
@@ -93,6 +93,8 @@
             "Authorization": localStorage.getItem("token")
           }
         }).then(res => {
+          // 保存记录
+          this.$axios.get('/records/add/'+ this.$store.getters.getUser.id + '?type=logout')
           _this.$store.commit("REMOVE_INFO")
           _this.$router.push("/login")
 

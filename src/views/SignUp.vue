@@ -28,12 +28,6 @@
         </el-form>
       </el-main>
     </el-container>
-
-    
-    
-
-
-    
   </div>
 </template>
 
@@ -117,11 +111,15 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$axios.post('/signUp', this.ruleForm).then(res => {
-              this.$alert('操作成功', '提示', {
+              this.$alert('注册成功', '提示', {
                 callback: action => {
                   this.$router.push("/login");
                 }
               });
+            })
+            this.$axios.get('/user/getUserByName/' + this.ruleForm.username).then(res => {
+              // 保存记录
+              this.$axios.get('/records/add/'+ res.data.data.id + '?type=signUp')
             })
           } else {
             console.log('error submit!!');

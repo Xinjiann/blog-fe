@@ -15,7 +15,7 @@
           ref="ruleForm"
           label-width="100px"
           class="demo-ruleForm"
-          style="width: 55%; margin-left: 33%"
+          style="width: 50%; margin-left: 36.5%"
         >
           <el-form-item label="用户名" prop="username">
             <el-input v-model="ruleForm.username"></el-input>
@@ -23,7 +23,7 @@
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="ruleForm.password"></el-input>
           </el-form-item>
-          <el-form-item style="width: 90%">
+          <el-form-item>
             <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
             <el-button @click="resetForm('ruleForm')">重置</el-button>
             <el-button @click="signUp">注册</el-button>
@@ -68,6 +68,9 @@ export default {
             // 把数据共享出去
             _this.$store.commit("SET_TOKEN", jwt)
             _this.$store.commit("SET_USERINFO", userInfo)
+            // 保存记录
+            this.$axios.get('/records/add/'+ userInfo.id + '?type=login')
+            
 
             _this.$router.push("/blogs")
           });

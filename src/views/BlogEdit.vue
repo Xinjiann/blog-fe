@@ -14,13 +14,13 @@
         </el-form-item>
 
         <el-form-item label="内容" prop="content">
-          <mavon-editor v-model="ruleForm.content"></mavon-editor>
+          <mavon-editor v-model="ruleForm.content" ref="md" @imgAdd="imgAdd"></mavon-editor>
         </el-form-item>
 
 
 
         <el-form-item style="margin-right:3%;">
-          <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
           <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -61,6 +61,22 @@
       };
     },
     methods: {
+
+      imgAdd(pos, $file) {
+        let formdata = new FormData();
+        formdata.append('image', $file);
+        this.$axios.post("/uploadToLocal",formdata,{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((response) => {
+            // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+            if (response.status === 200) {
+                var url = response.data.data;
+                this.$refs.md.$img2Url(pos,url)
+            }
+        })
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -72,7 +88,7 @@
             }).then(res => {
               // 保存记录
               const userId = this.$store.getters.getUser.id;
-              this.$axios.get('/records/add/'+ userId)
+              this.$axios.get('/records/add/'+ userId + '?type=editBlog')
               _this.$alert('操作成功', '提示', {
                 confirmButtonText: '确定',
                 callback: action => {

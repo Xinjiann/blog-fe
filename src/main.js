@@ -6,6 +6,7 @@ import Element from 'element-ui'
 import axios from 'axios'
 import mavonEditor from 'mavon-editor'
 import VueCalendarHeatmap from 'vue-calendar-heatmap'
+import 'lib-flexible'
 
 
 

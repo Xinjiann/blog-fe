@@ -119,6 +119,8 @@
                 const userInfo = this.$store.getters.getUser;
                 userInfo.username = this.inputUsername
                 this.$store.commit("SET_USERINFO", userInfo)
+                // 保存记录
+                this.$axios.get('/records/add/'+ userId + '?type=editUsername')
                 this.$router.go(0);
               }
             });
@@ -141,6 +143,9 @@
       success(){
         this.$message("头像上传成功")
         this.initUser();
+        // 保存记录
+        this.$axios.get('/records/add/'+ this.userId + '?type=editAvatar')
+
       },
       showEdit(){
         if (this.$store.getters.getUser.id != this.user.id){
@@ -228,12 +233,9 @@
       },
 
       getRecord(){
-        this.$axios.get("/records/" + this.userId).then(res => {
+        this.$axios.get("/records/" + this.userId).then(res => {       
           res.data.data.forEach(i => {
-            this.values.push({
-              date: i.date,
-              count: i.count
-            })
+            this.values.push(i)
           });
         });
       },
