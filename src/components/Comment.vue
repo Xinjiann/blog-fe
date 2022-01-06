@@ -20,7 +20,7 @@
     <br>
     <br>
     
-    <div class="comment" v-for="item in comments" :key="item.id">
+    <div class="comment" v-for="(item,index) in comments" :key="index">
       <div class="info">
         <img class="avatar" :src="item.userAvatar" width="36" height="36" @click="toProfile(item.createUserId)" style="cursor: pointer"/>
         <div class="right">
@@ -32,17 +32,17 @@
       </div>
       <div class="content">{{item.content}}</div>
       <div class="control">
-        <!-- <span class="like" :class="{active: item.isLike}" @click="likeClick(item)">
+        <span class="like" :class="{active: item.isLike}" @click="likeClick(item.id, index)">
           <i class="iconfont icon-like"></i>
-          <span class="like-num">{{1> 0 ? 1 + '人赞' : '赞'}}</span>
-        </span> -->
+          <span class="like-num">{{item.likes > 0 ? item.likes + '人赞' : '赞'}}</span>
+        </span>
         <span class="comment-reply" @click="showCommentInput(item)">
           <i class="iconfont icon-comment"></i>
           <span>回复</span>
         </span>
       </div>
       <div class="reply">
-        <div class="item" v-for="reply in item.reply.replies">
+        <div class="item" v-for="(reply,index) in item.reply.replies" :key="index">
           <div class="reply-content">
             <span class="from-name">
               <el-link @click="toProfileByname(reply.createUser)">{{reply.createUser}}</el-link>
@@ -119,21 +119,13 @@
       /**
        * 点赞
        */
-      likeClick(item) {
-        // if (item.isLike === null) {
-        //   Vue.$set(item, "isLike", true);
-        //   item.likeNum++
-        // } else {
-        //   if (item.isLike) {
-        //     item.likeNum--
-        //   } else {
-        //     item.likeNum++
-        //   }
-        //   item.isLike = !item.isLike;
-        // }
-        console.log("点赞")
+      likeClick(commentId, index) {
+        if(!this.$store.getters.getUser.id){
+          this.$message('请先登录');
+        } else {
+          this.$emit('like', commentId, index);
+        }
       },
-
       /**
        * 点击取消按钮
        */
@@ -160,6 +152,8 @@
               createUserId: this.userInfo.id,
             }
             this.$axios.post('/comment/comment', commentForm).then(res => {
+              // 保存记录
+              this.$axios.get('/records/add/'+ commentForm.createUserId + '?type=comment')
               this.$alert('操作成功', '提示', {
                 callback: action => {
                   this.$router.go(0);
@@ -184,6 +178,8 @@
               userAvatar: this.userInfo.avatar,
             }
             this.$axios.post('/comment/reply', replyForm).then(res => {
+              // 保存记录
+              this.$axios.get('/records/add/'+ this.$store.getters.getUser.id + '?type=reply')
               this.$alert('操作成功', '提示', {
                 callback: action => {
                   this.$router.go(0);
