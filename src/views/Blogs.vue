@@ -12,6 +12,8 @@
               <router-link :to="{name: 'BlogDetail', params: {blogId: blog.id}}">
                 {{blog.title}}
               </router-link>
+              <i v-if="favorite.indexOf(blog.id+'') != -1" class="el-icon-star-on" style="color: red; cursor: pointer; margin-left: 4px" @click="rmFavorite(blog.id)"></i>
+              <i v-else class="el-icon-star-off" style="color: blue; cursor: pointer; margin-left: 4px" @click="addFavorite(blog.id)"></i>
             </h4>
             <p>{{blog.description}}</p>
           </el-card>
@@ -47,6 +49,9 @@
     components: {Header, vueCanvasNest},
     data() {
       return {
+        storeId: 0,
+        favorite: [],
+        hasLogin: false,
         config: {
           color: "255,0,0",
           opacity: 1.3,
@@ -62,8 +67,40 @@
       }
     },
     methods: {
+
+      checkLogin() {
+        if (this.$store.getters.getUser.id) {
+          this.storeId = this.$store.getters.getUser.id;
+          this.hasLogin = true;
+        }
+      },
+      async initUser() {
+        if (this.hasLogin) {
+          await this.$axios.get("/user/getFavorite/" + this.storeId).then(res => {
+            this.favorite = res.data.data
+          })
+        }
+      },
+      addFavorite(blogId) {
+        if(!this.hasLogin) {
+          this.$message.error("请先登录")
+        } else {
+          this.$axios.get("blog/addFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
+            this.initUser();
+          })
+        }
+      },
+      rmFavorite(blogId) {
+        if(!this.hasLogin) {
+          this.$message.error("请先登录")
+        } else {
+          this.$axios.get("blog/rmFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
+            this.initUser();
+          })
+        }
+      },
       page(currentPage) {
-        if(!this.$store.getters.getUser){
+        if(!this.hasLogin){
           this.$store.commit("REMOVE_INFO")
         }
         const _this = this
@@ -72,7 +109,6 @@
           _this.currentPage = res.data.data.current
           _this.total = res.data.data.total
           _this.pageSize = res.data.data.size
-
         })
       },
 
@@ -98,6 +134,8 @@
 
   
     created() {
+      this.checkLogin();
+      this.initUser();
       this.page(1)
     }
   }

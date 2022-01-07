@@ -9,7 +9,7 @@
     <span class="block">
       <el-upload 
         v-if="admin === 9866 || user.id === storeUserId"
-        action="http://47.104.92.236:8081/file/upload"
+        action="http://localhost:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
         :on-success="success"
@@ -38,7 +38,17 @@
     </div>
 
     <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br>
-    <h3 style="margin-right: 50.5%; font-size: 14px">Blogs</h3>
+    <!-- <h3 style="margin-right: 50.5%; font-size: 14px">Blogs</h3> -->
+    <el-tabs @tab-click="handleClick" style="width: 54.2%; margin-left: 23.4%">
+      <el-tab-pane label="博客" name="first">
+        <!-- <div style="margin-right: 96%; font-size: 15px">博客</div> -->
+      </el-tab-pane>
+      <el-tab-pane label="收藏博客" name="second">
+        <!-- <div style="margin-right: 93%; font-size: 15px">收藏博客</div> -->
+      </el-tab-pane>
+      <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
+      <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
+    </el-tabs>
     <el-row :gutter="10" style="width: 55%; margin-left: 23%">
       <el-col :span="8" v-for="blog in blogs" :key="blog.id">
         <br>
@@ -108,6 +118,9 @@
       }
     },
     methods: {
+      handleClick(tab) {
+        console.log(tab.index);
+      },
       editUsername() {
         if(this.inputUsername.length<2){
           this.$message.error("账号长度至少两位")
