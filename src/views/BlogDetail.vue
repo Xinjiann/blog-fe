@@ -14,9 +14,16 @@
           编辑
           </router-link>
         </el-link>
+        <el-link v-if="favorite.indexOf(blog.id+'')!=-1" icon="el-icon-lollipop" style="margin-left: 6px" @click="rmFavorite(blog.id)">已收藏</el-link>
+        <el-link v-else icon="el-icon-lollipop" style="margin-left: 6px" @click="addFavorite(blog.id)">收藏</el-link>
         <el-link icon="el-icon-edit" style="float: right;">
           <span @click="deleteBlog()">删除</span>
         </el-link>
+      </div>
+      <div v-if="!ownBlog">
+        <br>
+        <el-link v-if="favorite.indexOf(blog.id+'')!=-1" icon="el-icon-lollipop" @click="rmFavorite(blog.id)">已收藏</el-link>
+        <el-link v-else icon="el-icon-lollipop" @click="addFavorite(blog.id)">收藏</el-link>
       </div>
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
@@ -75,17 +82,45 @@
           name: "",
           avatar: "",
         },
+        favorite: [],
+        storeId: 0,
+        hasLogin: false,
       }
     },
     created() {
+      this.checkLogin();
       this.blogId = this.$route.params.blogId;
+      this.initFavorite();
       this.getBlog(this.blogId);
       this.page(1);
-      
     },
     methods: {
+      checkLogin() {
+        if (this.$store.getters.getUser.id) {
+          this.storeId = this.$store.getters.getUser.id;
+          this.hasLogin = true;
+        }
+      },
+      addFavorite(blogId) {
+        if(!this.hasLogin) {
+          this.$message.error("请先登录")
+        } else {
+          this.$axios.get("blog/addFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
+            this.initFavorite();
+          })
+        }
+      },
+      rmFavorite(blogId) {
+        if(!this.hasLogin) {
+          this.$message.error("请先登录")
+        } else {
+          this.$axios.get("blog/rmFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
+            this.initFavorite();
+          })
+        }
+      },
       async like(commentId, index) {
-        await this.$axios.get('/like?targetId=' + commentId + '&likeUserId=' + this.$store.getters.getUser.id).then(res => {
+        await this.$axios.get('/like?targetId=' + commentId + '&likeUserId=' + this.storeId).then(res => {
           this.$axios.get('/like/count?' + 'commentId=' + commentId).then(res => {
             const i = res.data.data;
             const comment = this.comments[index];
@@ -115,7 +150,6 @@
                 comment.userAvatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
               }
             });
-
             this.$axios.get('/like/count?' + 'commentId=' + comment.id).then(res => {
               const count = res.data.data;
               this.comments[i].likes = count;
@@ -126,8 +160,13 @@
           this.total = res.data.data.total
           this.pageSize = res.data.data.size
         })    
-        
-        
+      },
+      async initFavorite() {
+        if (this.hasLogin) {
+          await this.$axios.get("/user/getFavorite/" + this.storeId).then(res => {
+            this.favorite = res.data.data
+          })
+        }
       },
       async getBlog(blogId){
         await this.$axios.get('/blog/' + blogId).then(res => {
@@ -141,25 +180,23 @@
 
           var result = md.render(blog.content)
           this.blog.content = result
-          this.ownBlog = (blog.userId === this.$store.getters.getUser.id)
+          this.ownBlog = (blog.userId === this.storeId)
         })
         this.getUserInfo();
       },
-      
       getUserInfo(){
         this.$axios.get('/user/getUser/' + this.createUserId).then(res => {
           const user = res.data.data
           this.createUserInfo.name = user.username;
           this.createUserInfo.avatar = user.avatar;
         });
-        if (this.$store.getters.getUser.id) {
-          this.$axios.get('/user/getUser/' + this.$store.getters.getUser.id).then(res => {
+        if (this.hasLogin) {
+          this.$axios.get('/user/getUser/' + this.storeId).then(res => {
             const storeUser = res.data.data;
             this.admin = storeUser.isAdmin === 9866;   
           });
         }
       },
-
       async deleteBlog(){
         await this.$confirm('确定删除吗?');
         this.$axios.get('/blog/delete/' + this.blog.id, {
@@ -169,7 +206,7 @@
         }).then(res => {
           this.$message('删除成功')
           // 保存记录
-          this.$axios.get('/records/add/'+ this.$store.getters.getUser.id + '?type=deleteBlog')
+          this.$axios.get('/records/add/'+ this.storeId + '?type=deleteBlog')
           this.$router.go(-1)
         });
       },

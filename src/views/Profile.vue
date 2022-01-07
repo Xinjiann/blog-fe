@@ -9,7 +9,7 @@
     <span class="block">
       <el-upload 
         v-if="admin === 9866 || user.id === storeUserId"
-        action="http://localhost:8081/file/upload"
+        action="http://47.104.92.236:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
         :on-success="success"
@@ -38,39 +38,76 @@
     </div>
 
     <calendar-heatmap style="width: 52%" :endDate="today" :values="values"/><br><br>
-    <!-- <h3 style="margin-right: 50.5%; font-size: 14px">Blogs</h3> -->
-    <el-tabs @tab-click="handleClick" style="width: 54.2%; margin-left: 23.4%">
+    <el-tabs v-model="activeName" @tab-click="handleClick" style="width: 54.2%; margin-left: 23.4%">
       <el-tab-pane label="博客" name="first">
-        <!-- <div style="margin-right: 96%; font-size: 15px">博客</div> -->
       </el-tab-pane>
       <el-tab-pane label="收藏博客" name="second">
-        <!-- <div style="margin-right: 93%; font-size: 15px">收藏博客</div> -->
       </el-tab-pane>
-      <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
-      <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
+      <!-- <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
+      <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane> -->
     </el-tabs>
-    <el-row :gutter="10" style="width: 55%; margin-left: 23%">
-      <el-col :span="8" v-for="blog in blogs" :key="blog.id">
-        <br>
-        <el-card style="height: 160px" shadow="hover" :body-style="{ padding: '17px' }">
-          <el-link @click="toBlog(blog.id)" style="color: #58A6FF; font-size: 11px; float:left; text-align: left">
-            {{ blog.title }}
-          </el-link><br><br>
-          <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
+    <div v-if="showBlogs">
+      <el-row :gutter="10" style="width: 55%; margin-left: 23%">
+        <div v-if="!blogs.length>0">
           <br>
-          <div style="margin-right: 138px; bottom: 1px; color: gray;">{{blog.created}}</div>
-        </el-card>
-      </el-col>
-    </el-row><br><br><br>
+          <el-card style="width: 95%; margin: 0 auto">未发表博客</el-card>
+          <br>
+        </div>
+        <el-col :span="8" v-for="blog in blogs" :key="blog.id">
+          <br>
+          <el-card style="height: 160px" shadow="hover" :body-style="{ padding: '17px' }">
+            <el-link @click="toBlog(blog.id)" style="color: #58A6FF; font-size: 11px; float:left; text-align: left">
+              {{ blog.title }}
+            </el-link><br><br>
+            <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
+            <br>
+            <div style="margin-right: 138px; bottom: 1px; color: gray;">{{blog.created}}</div>
+          </el-card>
+        </el-col>
+      </el-row><br><br><br>
 
-    <el-pagination class="mpage"
-                   background
-                   layout="prev, pager, next"
-                   :current-page="currentPage"
-                   :page-size="pageSize"
-                   :total="total"
-                   @current-change=page>
-    </el-pagination>
+      <el-pagination class="mpage"
+                    v-if="blogs.length>0"
+                    background
+                    layout="prev, pager, next"
+                    :current-page="currentPage"
+                    :page-size="pageSize"
+                    :total="total"
+                    @current-change=page>
+      </el-pagination>
+    </div>
+
+    <div v-if="showFavorite">
+      <el-row :gutter="10" style="width: 55%; margin-left: 23%">
+        <div v-if="favorites.length===0">
+          <br>
+          <el-card style="width: 95%; margin: 0 auto">未收藏博客</el-card>
+          <br>
+        </div>
+        <el-col :span="8" v-for="blog in favorites" :key="blog.id">
+          <br>
+          <el-card style="height: 160px" shadow="hover" :body-style="{ padding: '17px' }">
+            <el-link @click="toBlog(blog.id)" style="color: #58A6FF; font-size: 11px; float:left; text-align: left">
+              {{ blog.title }}
+            </el-link><br><br>
+            <div style="text-align: left; font-size: 0.1px;">{{blog.description.slice(0, 50) + (blog.description.length>50 ? '...' : '')}}</div>
+            <br>
+            <div style="margin-right: 138px; bottom: 1px; color: gray;">{{blog.created}}</div>
+          </el-card>
+        </el-col>
+      </el-row><br><br><br>
+
+      <el-pagination class="mpage"
+                    v-if="favorites.length>0"
+                    background
+                    layout="prev, pager, next"
+                    :current-page="currentPage2"
+                    :page-size="pageSize2"
+                    :total="total2"
+                    @current-change=getFavorite>
+      </el-pagination>
+      
+    </div>
   </div>
 </template>
 
@@ -85,6 +122,9 @@
     },
     data() {
       return {
+        activeName: 'first',
+        showBlogs: true,
+        showFavorite: false,
         config: {
           color: "255,0,0",
           opacity: 1.3,
@@ -115,11 +155,22 @@
         blogs: {},
         total: 0,
         pageSize: 6,
+        favorites: [],
+        currentPage2: 1,
+        total2: 0,
+        pageSize2: 6,
       }
     },
     methods: {
       handleClick(tab) {
-        console.log(tab.index);
+        if (tab.index === '0') {
+          this.showBlogs = true;
+          this.showFavorite = false;
+        }
+        if (tab.index === '1') {
+          this.showBlogs = false;
+          this.showFavorite = true;
+        }
       },
       editUsername() {
         if(this.inputUsername.length<2){
@@ -173,9 +224,11 @@
       page(currentPage) {
         const userId = typeof this.$route.params.id === 'undefined' ? this.$store.getters.getUser.id : this.$route.params.id;
         this.$axios.get("/blogsByUserId/" + userId + '?currentPage=' + currentPage).then(res => {
-          this.blogs = res.data.data.records;
-          this.total = res.data.data.total;
-          this.pageSize = res.data.data.size;
+          const data = res.data.data;
+          this.blogs = data.records;
+          this.total = data.total;
+          this.pageSize = data.size;
+          this.currentPage = data.current;
         })
       },
       toBlog(id) {
@@ -215,15 +268,32 @@
             });      
           }
           this.hasLogin = true;
+          this.getFavorite(1);
           this.initBlogs();
           this.getRecord();
         } 
       },
+      getFavorite(currentPage) {
+        this.$axios.get("/user/getFavorite/" + this.userId).then(res => {
+          this.favorites = [];
+          const favorite = res.data.data
+          if (favorite.length != 0){
+            this.$axios.post("blog/listByIds?currentPage=" + currentPage, favorite).then(res => {
+              const data = res.data.data;
+              this.total2 = data.total;
+              this.pageSize2 = data.size;
+              this.favorites = data.records;
+              this.currentPage2 = data.current;
+            })
+          }
+        })
+      },
       initBlogs(){
         this.$axios.get("/blogsByUserId/" + this.userId + '?currentPage=' + this.currentPage).then(res => {
-          this.blogs = res.data.data.records;
-          this.total = res.data.data.total;
-          this.pageSize = res.data.data.size;
+          const data = res.data.data;
+          this.blogs = data.records;
+          this.total = data.total;
+          this.pageSize = data.size;
         });
       },
       calculateValue(value) {

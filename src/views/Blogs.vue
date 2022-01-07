@@ -9,10 +9,10 @@
         <el-timeline-item v-bind:timestamp="blog.created" placement="top" v-for="blog in blogs" :key="blog.id">
           <el-card>
             <h4>
-              <router-link :to="{name: 'BlogDetail', params: {blogId: blog.id}}">
+              <router-link :to="{name: 'BlogDetail', params: {blogId: blog.id}}" class="span-line">
                 {{blog.title}}
               </router-link>
-              <i v-if="favorite.indexOf(blog.id+'') != -1" class="el-icon-star-on" style="color: red; cursor: pointer; margin-left: 4px" @click="rmFavorite(blog.id)"></i>
+              <i v-if="favorite.indexOf(blog.id+'') != -1" class="el-icon-star-on" style="color: red; cursor: pointer; margin-left: 1px" @click="rmFavorite(blog.id)"></i>
               <i v-else class="el-icon-star-off" style="color: blue; cursor: pointer; margin-left: 4px" @click="addFavorite(blog.id)"></i>
             </h4>
             <p>{{blog.description}}</p>
@@ -74,7 +74,7 @@
           this.hasLogin = true;
         }
       },
-      async initUser() {
+      async initFavorite() {
         if (this.hasLogin) {
           await this.$axios.get("/user/getFavorite/" + this.storeId).then(res => {
             this.favorite = res.data.data
@@ -86,7 +86,7 @@
           this.$message.error("请先登录")
         } else {
           this.$axios.get("blog/addFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
-            this.initUser();
+            this.initFavorite();
           })
         }
       },
@@ -95,7 +95,7 @@
           this.$message.error("请先登录")
         } else {
           this.$axios.get("blog/rmFavorite?userId=" + this.storeId + "&blogId=" + blogId).then(res => {
-            this.initUser();
+            this.initFavorite();
           })
         }
       },
@@ -135,13 +135,25 @@
   
     created() {
       this.checkLogin();
-      this.initUser();
+      this.initFavorite();
       this.page(1)
     }
   }
 </script>
 
 <style scoped>
+
+  a{
+    text-decoration: none;
+  }
+
+  .router-link-active {
+    text-decoration: none;
+  }
+
+  .span-line:hover{
+    text-decoration:underline;
+  }
 
   .mpage {
     margin: 0 auto;
