@@ -49,7 +49,7 @@
         rules: {
           title: [
             { required: true, message: '请输入标题', trigger: 'blur' },
-            { min: 3, max: 25, message: '长度在 3 到 25 个字符', trigger: 'blur' }
+            { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
           ],
           description: [
             { required: true, message: '请输入摘要', trigger: 'blur' }

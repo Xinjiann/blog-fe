@@ -2,11 +2,12 @@
   <div>
     <el-container  style="width:100%; margin: 0 auto">
       <el-header>
-        <img
+        <!-- <img
           class="mlogo"
-          src="https://markerhub.com/dist/images/logo/markerhub-logo.png"
+          src="https://xinjian-blog.oss-cn-beijing.aliyuncs.com/helloWorld.jpg?Expires=1641660933&OSSAccessKeyId=TMP.3KeKqEfPmRxg5rDu1ZtESnBaGPDDE6TY5TQoas2eYq22ySyNRFdD64NAdaBVykwCoGMhUxfQjAsEFWoLb4KCDzgQsUqWLT&Signature=Lmui7%2F49RmWYx1cO73Ktzy7Va2E%3D"
           alt=""
-        />
+        /> -->
+        <h2 style="line-height: 30px">欢迎来到树洞博客</h2>
       </el-header>
       <el-main>
         <el-form
@@ -24,9 +25,9 @@
             <el-input type="password" v-model="ruleForm.password"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
-            <el-button @click="resetForm('ruleForm')">重置</el-button>
-            <el-button @click="signUp">注册</el-button>
+            <el-button type="primary" size="small" @click="submitForm('ruleForm')" style="margin-right: 4px">登陆</el-button>
+            <el-button size="small" @click="signUp">注册</el-button>
+            <el-button size="small" @click="toResetPassWord">重置密码</el-button>
           </el-form-item>
         </el-form>
       </el-main>
@@ -55,6 +56,9 @@ export default {
     };
   },
   methods: {
+    toResetPassWord() {
+      this.$router.push("/resetPassword");
+    },
     signUp(){
       this.$router.push("/signUp");
     },

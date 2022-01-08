@@ -1,27 +1,26 @@
 <template>
   <div>
 
-    <el-page-header @back="goBack" content="注册">
+    <el-page-header @back="goBack" content="重置密码">
     </el-page-header><br>
 
     <el-container>
       <el-header>
-        <h3 style="line-height: 30px">欢迎注册</h3>
+        <h3 style="line-height: 30px">重置密码</h3>
       </el-header>
       <el-main style="width:100%; margin-left: 0 auto">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 400px; margin-left: 35%">
           <el-form-item label="账号" prop="username">
           <el-input v-model="ruleForm.username"></el-input>
-           <!-- placeholder="请输入账号" -->
           </el-form-item>
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="原始密码" prop="password">
             <el-input v-model="ruleForm.password" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+          <el-form-item label="新密码" prop="newPassword">
+            <el-input v-model="ruleForm.newPassword" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="ruleForm.email"></el-input>
+          <el-form-item label="确认密码" prop="newPassword2">
+            <el-input v-model="ruleForm.newPassword2"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
@@ -29,6 +28,9 @@
           </el-form-item>
         </el-form>
       </el-main>
+      <!-- <br><br><br><br>
+      <h5 style="margin: 0 auto">页面还没开发好。。。</h5> -->
+     
     </el-container>
   </div>
 </template>
@@ -36,14 +38,6 @@
 <script>
   export default {
     data() {
-      var checkEmail = (rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入邮箱'));
-        } else{
-          callback();
-        }
-      };
-
       var validateUserName = (rule, value, callback) => {
         if (!value) {
           callback(new Error('请输入账号'));
@@ -53,24 +47,31 @@
           callback();
         }
       };
+      var checkPass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入原密码'));
+        } else if (value.length<6) {
+          callback(new Error('密码长度至少六位!'));
+        } else {
+          callback();
+        }
+      };
       var validatePass = (rule, value, callback) => {
         if (value === '') {
-          callback(new Error('请输入密码'));
+          callback(new Error('请输入新密码'));
         }else if(value.length<6){
           callback(new Error('密码长度至少六位'));
         } else {
-          if (this.ruleForm.checkPass !== '') {
-            this.$refs.ruleForm.validateField('checkPass');
+          if (this.ruleForm.newPassword !== '') {
+            this.$refs.ruleForm.validateField('newPassword2');
           }
           callback();
         }
-        
-        
       };
       var validatePass2 = (rule, value, callback) => {
         if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.ruleForm.password) {
+          callback(new Error('请再次输入新密码'));
+        } else if (value !== this.ruleForm.newPassword) {
           callback(new Error('两次输入密码不一致!'));
         } else {
           callback();
@@ -81,8 +82,8 @@
         ruleForm: {
           username: '',
           password: '',
-          checkPass: '',
-          email:'',
+          newPassword: '',
+          newPassword2:'',
         },
         rules: {
           username: [
@@ -90,14 +91,14 @@
             {required: true}
           ],
           password: [
+            { validator: checkPass, trigger: 'blur' },
+            {required: true}
+          ],
+          newPassword: [
             { validator: validatePass, trigger: 'blur' },
             {required: true}
           ],
-          email: [
-            { validator: checkEmail, trigger: 'blur' },
-            {required: true}
-          ],
-          checkPass: [
+          newPassword2: [
             { validator: validatePass2, trigger: 'blur' },
             {required: true}
           ],
@@ -112,14 +113,14 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$axios.post('/signUp', this.ruleForm).then(res => {
+            this.$axios.post('/resetPassword', this.ruleForm).then(res => {
               if (res.status === 200) {
                 this.$axios.get('/user/getUserByName/' + this.ruleForm.username).then(res => {
                   // 保存记录
-                  this.$axios.get('/records/add/'+ res.data.data.id + '?type=signUp')
+                  this.$axios.get('/records/add/'+ res.data.data.id + '?type=resetPassword')
                 })
               }
-              this.$alert('注册成功', '提示', {
+              this.$alert('修改成功', '提示', {
                 callback: action => {
                   this.$router.push("/login");
                 }

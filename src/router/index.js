@@ -6,7 +6,7 @@ import BlogEdit from '../views/BlogEdit.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import SignUp from '../views/SignUp.vue'
 import Profile from '../views/Profile.vue'
-import Profile2 from '../views/Profile2.vue'
+import ResetPassword from '../views/ResetPassword.vue'
 
 Vue.use(VueRouter)
 
@@ -52,9 +52,9 @@ const routes = [
     component: Profile
   },
   {
-    path: '/profile2',
-    name: 'Profile2',
-    component: Profile2
+    path: '/resetPassword',
+    name: 'ResetPassword',
+    component: ResetPassword
   },
 ]
 const router = new VueRouter({

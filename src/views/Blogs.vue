@@ -17,9 +17,7 @@
             </h4>
             <p>{{blog.description}}</p>
           </el-card>
-          
         </el-timeline-item>
-
         <div v-if="blogs.length===0">
           <br>
           <el-card>无数据</el-card>
@@ -67,8 +65,10 @@
       }
     },
     methods: {
-
       checkLogin() {
+        if(!this.$store.getters.getUser){
+          this.$store.commit("REMOVE_INFO")
+        }
         if (this.$store.getters.getUser.id) {
           this.storeId = this.$store.getters.getUser.id;
           this.hasLogin = true;
@@ -100,9 +100,6 @@
         }
       },
       page(currentPage) {
-        if(!this.hasLogin){
-          this.$store.commit("REMOVE_INFO")
-        }
         const _this = this
         _this.$axios.get("/blogs?currentPage=" + currentPage).then(res => {
           _this.blogs = res.data.data.records
@@ -127,12 +124,8 @@
             this.blogs = res.data.data;
           })
         }
-        
       }
-      
     },
-
-  
     created() {
       this.checkLogin();
       this.initFavorite();
