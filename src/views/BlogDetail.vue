@@ -4,9 +4,23 @@
     <Header></Header>
     <div class="mblog">
       <h2> {{ blog.title }}</h2>
-      <span style="font-size: 14px; color: #626567;">作者：</span>
-      <span class="span-line" style="font-size: 14px; color: #626567; cursor: pointer" @click="toProfile">{{createUserInfo.name}}</span>
-      <span style="font-size: 14px; color: #626567; float: right">{{blog.createTime}}</span><br>
+      <!-- <span style="font-size: 14px; color: #626567;">作者：</span> -->
+      <el-row :gutter="0">
+        <el-col :span="1.5">
+          <img :src="blogCreatorAvatar" width="42" height="42" @click="toProfile(blog.userId)" style="margin-left: 4px; vertical-align: middle; cursor: pointer; border-radius: 50%;"/>
+        </el-col>
+        <el-col :span="6">
+          <span>
+        
+            <div class="span-line" style="font-size: 16px; font-weight:350; color: black; cursor: pointer; margin-left: 6px;" @click="toProfile">
+            {{createUserInfo.name}}
+            </div>
+            <div style="font-size: 13px; font-weight:350; color: #626567; margin-left: 6px">{{blog.createTime}}</div>
+          </span>
+        </el-col>
+
+      </el-row>
+      
       <div v-if="ownBlog||admin">
         <br>
         <el-link icon="el-icon-edit">
@@ -85,6 +99,7 @@
         favorite: [],
         storeId: 0,
         hasLogin: false,
+        blogCreatorAvatar: '',
       }
     },
     created() {
@@ -181,6 +196,17 @@
           var result = md.render(blog.content)
           this.blog.content = result
           this.ownBlog = (blog.userId === this.storeId)
+
+          this.$axios.get('/user/getUser/'+blog.userId).then(res => {
+            let avatar =  res.data.data.avatar;
+            if(avatar != '') {
+              this.$axios.get("/file/getUrl/"+avatar).then(res =>{
+                this.blogCreatorAvatar = res.data.data;
+              })
+            } else {
+              this.blogCreatorAvatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
+            }
+          });
         })
         this.getUserInfo();
       },
