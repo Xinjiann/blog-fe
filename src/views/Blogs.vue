@@ -1,11 +1,10 @@
 <template >
   <div class="mcontaner">
     <vue-canvas-nest :config="config"></vue-canvas-nest>
-    <Header @searchBlog="search" showSearch='true'></Header>
+    <Header @searchBlog="search" @classSelect="getClassedBlogs" showSearch='true'></Header>
+    <!-- <Header2></Header2> -->
     <div class="blogs">
-      
       <el-timeline>
-
         <el-timeline-item v-bind:timestamp="blog.created" placement="top" v-for="blog in blogs" :key="blog.id">
           <el-card>
             <h4>
@@ -36,12 +35,15 @@
 
     </div>
 
+    
+
   </div>
 </template>
 
 <script>
   import Header from "../components/Header";
   import vueCanvasNest from "vue-canvas-nest";
+
   export default {
     name: "Blogs.vue",
     components: {Header, vueCanvasNest},
@@ -65,6 +67,13 @@
       }
     },
     methods: {
+      getClassedBlogs(input) {
+        
+        this.$axios.get("blog/getClassedBlogs?class=" + input).then(res => {
+          console.log(res)
+          this.blogs = res.data.data;
+        })
+      },
       checkLogin() {
         if(!this.$store.getters.getUser){
           this.$store.commit("REMOVE_INFO")

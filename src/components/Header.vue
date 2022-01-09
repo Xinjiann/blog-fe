@@ -1,6 +1,31 @@
 <template>
   <div class="m-content">
-    <h3>欢迎来到树洞博客</h3>
+    <br>
+
+    <el-row :gutter="2">
+      <el-col :span="13">
+        <div style="font-weight: 500; font-size: 15px; margin-left: 85%">欢迎来到树洞博客</div>
+      </el-col>
+      <el-col :span="7">
+        <el-dropdown style="margin-left: 47%" trigger="click" @command="handleCommand">
+          <span class="el-dropdown-link" style="cursor: pointer">
+            博客分类<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="算法/数据结构">算法/数据结构</el-dropdown-item>
+            <el-dropdown-item command="Java">Java</el-dropdown-item>
+            <el-dropdown-item command="Spring">Spring</el-dropdown-item>
+            <el-dropdown-item command="SpringBoot">SpringBoot</el-dropdown-item>
+            <el-dropdown-item command="Mysql">Mysql</el-dropdown-item>
+            <el-dropdown-item command="Redis">Redis</el-dropdown-item>
+            <el-dropdown-item command="扯淡">扯淡</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-col>
+    </el-row><br>
+    
+    
+    <!-- <br><br> -->
     <div class="block">
       <el-avatar @click.native="toProfile" :size="50" :src="user.avatar" style="cursor: pointer"></el-avatar>
       <div>
@@ -29,7 +54,7 @@
       <el-divider direction="vertical"></el-divider>
       <span><el-link @click="signUp">注册</el-link></span> 
     </div>
-
+    
     <span v-show="showSearch">
       <el-input style="width: 17%; margin-left: 5.5%" v-model="input" placeholder="搜索文章" prefix-icon="el-icon-search" @keyup.enter.native="search">
       </el-input>
@@ -85,6 +110,9 @@
       },
       search() {
         this.$emit("searchBlog", this.input)
+      },
+      handleCommand(command) {
+        this.$emit("classSelect", command);
       },
       logout() {
         const _this = this

@@ -28,8 +28,34 @@
           编辑
           </router-link>
         </el-link>
-        <el-link v-if="favorite.indexOf(blog.id+'')!=-1" icon="el-icon-lollipop" style="margin-left: 6px" @click="rmFavorite(blog.id)">已收藏</el-link>
-        <el-link v-else icon="el-icon-lollipop" style="margin-left: 6px" @click="addFavorite(blog.id)">收藏</el-link>
+        <el-link v-if="favorite.indexOf(blog.id+'')!=-1" icon="el-icon-lollipop" style="margin-left: 14px" @click="rmFavorite(blog.id)">已收藏</el-link>
+        <el-link v-else icon="el-icon-lollipop" style="margin-left: 14px" @click="addFavorite(blog.id)">收藏</el-link>
+
+        <el-popover
+          placement="bottom-start"
+          width="100"
+          v-model="visible"
+          style="margin-left: 14px">
+          <!-- <p></p> -->
+          <div style="text-align: center; margin: 0">
+            <el-link size="mini" type="text" @click="newClass" style="font-size: 14px">创建分类 | </el-link>
+            <el-link type="primary" size="mini" @click="selectClass" style="margin-left: 4px; font-size: 14px"> 选择分类</el-link>
+          </div>
+          <el-link slot="reference" icon="el-icon-lollipop" style="">分类</el-link>
+        </el-popover>
+
+        <el-select v-if="isSelectClass" v-model="selectValue" placeholder="请选择分类" size="mini" style="margin-left: 18px">
+          <el-option
+            v-for="item in options"
+            :key="item.label"
+            :label="item.label"
+            :value="item.value"> 
+          </el-option>
+        </el-select>
+        
+
+        <el-input v-if="isNewClass" v-model="selectValue" size="mini" placeholder="请输入内容" style="margin-left: 18px; width: 15%"></el-input>
+        <el-link v-if="isSelectClass||isNewClass" style="margin-left: 14px" @click="submitClass">确定</el-link>
         <el-link icon="el-icon-edit" style="float: right;">
           <span @click="deleteBlog()">删除</span>
         </el-link>
@@ -70,6 +96,7 @@
     components: {Header, Comment, vueCanvasNest},
     data() {
       return {
+        
         refresh: 0,
         config: {
           color: "255,0,0",
@@ -100,6 +127,39 @@
         storeId: 0,
         hasLogin: false,
         blogCreatorAvatar: '',
+        visible: false,
+        isNewClass: false,
+        isSelectClass: false,
+        selectValue: '',
+        options: [{
+          value: '算法/数据结构',
+          label: '算法/数据结构'
+        },
+        {
+          value: 'Java',
+          label: 'Java'
+        },
+        {
+          value: 'Spring',
+          label: 'Spring'
+        },
+        {
+          value: 'SpringBoot',
+          label: 'SpringBoot'
+        },
+        {
+          value: 'Mysql',
+          label: 'Mysql'
+        },
+        {
+          value: 'Redis',
+          label: 'Redis'
+        },
+        {
+          value: '扯淡',
+          label: '扯淡'
+        },
+        ],
       }
     },
     created() {
@@ -110,6 +170,23 @@
       this.page(1);
     },
     methods: {
+      submitClass() {
+        this.$axios.get("blog/editClass/" + this.blogId + '?class=' + this.selectValue).then(res => {
+          this.$message.success("修改成功")
+          this.isSelectClass = false;
+          this.isNewClass = false;
+        })
+      },
+      newClass() {
+        this.isSelectClass = false;
+        this.isNewClass = true;
+        this.visible = false;
+      },
+      selectClass() {
+        this.isNewClass = false;
+        this.isSelectClass = true;
+        this.visible = false;
+      },
       checkLogin() {
         if (this.$store.getters.getUser.id) {
           this.storeId = this.$store.getters.getUser.id;
