@@ -7,8 +7,8 @@
         <div style="font-weight: 500; font-size: 15px; margin-left: 85%">欢迎来到树洞博客</div>
       </el-col>
       <el-col :span="7">
-        <el-dropdown style="margin-left: 47%" trigger="click" @command="handleCommand">
-          <span class="el-dropdown-link" style="cursor: pointer">
+        <el-dropdown style="margin-left: 47%" trigger="click" @command="handleCommand" v-if="showSearch">
+          <span class="el-dropdown-link" style="cursor: pointer" >
             博客分类<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -16,8 +16,11 @@
             <el-dropdown-item command="Java">Java</el-dropdown-item>
             <el-dropdown-item command="Spring">Spring</el-dropdown-item>
             <el-dropdown-item command="SpringBoot">SpringBoot</el-dropdown-item>
+            <el-dropdown-item command="SpringCloud">SpringCloud</el-dropdown-item>
             <el-dropdown-item command="Mysql">Mysql</el-dropdown-item>
             <el-dropdown-item command="Redis">Redis</el-dropdown-item>
+            <el-dropdown-item command="Docker">Docker</el-dropdown-item>
+            <!-- <el-dropdown-item command="Docker">Docker</el-dropdown-item> -->
             <el-dropdown-item command="扯淡">扯淡</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>

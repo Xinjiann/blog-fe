@@ -14,7 +14,7 @@
         </el-form-item>
 
         <el-form-item label="内容" prop="content">
-          <mavon-editor v-model="ruleForm.content" ref="md" @imgAdd="imgAdd"></mavon-editor>
+          <mavon-editor v-model="ruleForm.contentMarkdown" ref="md" @imgAdd="imgAdd" :ishljs = "true" htmlcode: true @change="changeData"></mavon-editor>
         </el-form-item>
 
 
@@ -44,7 +44,8 @@
           id: '',
           title: '',
           description: '',
-          content: ''
+          content: '',
+          contentMarkdown: '',
         },
         rules: {
           title: [
@@ -57,10 +58,15 @@
           content: [
             { trequired: true, message: '请输入内容', trigger: 'blur' }
           ]
-        }
+        },
+        render: ''
       };
+        
     },
     methods: {
+      changeData(value, render) {
+          this.render = render;
+      },
 
       imgAdd(pos, $file) {
         let formdata = new FormData();
@@ -81,6 +87,8 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             const _this = this
+            this.ruleForm.content = this.render;
+            console.log(this.render)
             this.$axios.post('/blog/edit', this.ruleForm, {
               headers: {
                 "Authorization": localStorage.getItem("token")
@@ -117,7 +125,8 @@
           _this.ruleForm.id = blog.id
           _this.ruleForm.title = blog.title
           _this.ruleForm.description = blog.description
-          _this.ruleForm.content = blog.content
+          _this.ruleForm.contentMarkdown = blog.contentMarkdown
+          // _this.ruleForm.content = blog
         })
       }
 

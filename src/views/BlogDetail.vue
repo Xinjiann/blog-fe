@@ -89,14 +89,13 @@
   import Header from "../components/Header";
   import Comment from '../components/Comment'
   import vueCanvasNest from "vue-canvas-nest";
-
+  
   export default {
 
     name: "BlogDetail.vue",
     components: {Header, Comment, vueCanvasNest},
     data() {
       return {
-        
         refresh: 0,
         config: {
           color: "255,0,0",
@@ -267,11 +266,24 @@
           this.blog.title = blog.title
           this.createUserId = blog.userId;
           this.blog.createTime = blog.created;
-          var MardownIt = require("markdown-it")
-          var md = new MardownIt()
-
-          var result = md.render(blog.content)
-          this.blog.content = result
+          // var MardownIt = require("markdown-it")
+          // var md = new MardownIt({
+          //   highlight: function (str, lang) {
+          //     if (lang && hljs.getLanguage(lang))
+          //     {
+          //       try
+          //       {
+          //         return '<pre class="hljs"><code>' +
+          //           hljs.highlight(lang, str, true).value +
+          //           '</code></pre>';
+          //       } catch (__) { }
+          //     }
+          //     return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+          //   }
+          // });
+          // var result = md.render(blog.content)
+          // this.blog.content = result
+          this.blog.content = blog.content;
           this.ownBlog = (blog.userId === this.storeId)
 
           this.$axios.get('/user/getUser/'+blog.userId).then(res => {
