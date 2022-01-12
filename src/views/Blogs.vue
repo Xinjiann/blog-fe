@@ -1,7 +1,7 @@
 <template >
   <div class="mcontaner">
     <vue-canvas-nest :config="config"></vue-canvas-nest>
-    <Header @searchBlog="search" @classSelect="getClassedBlogs" showSearch='true'></Header>
+    <Header @searchBlog="search" @settingJump="jump" @classSelect="getClassedBlogs" showSearch='true'></Header>
     <!-- <Header2></Header2> -->
     <div class="blogs">
       <el-timeline>
@@ -73,6 +73,29 @@
           console.log(res)
           this.blogs = res.data.data;
         })
+      },
+      jump(input) {
+        if(!this.$store.getters.getUser.id) {
+          this.$message.error("请先登录")
+        } else {
+          if (input === 'profile'){
+            this.$router.push({ name: 'Profile', params: { id: this.$store.getters.getUser.id } })
+          } else if (input === 'addBlog'){
+            this.$router.push("/blog/add");
+          } else if (input === 'logout') {
+            this.$axios.get("/logout", {
+              headers: {
+                "Authorization": localStorage.getItem("token")
+              }
+            }).then(res => {
+              // 保存记录
+              this.$axios.get('/records/add/'+ this.$store.getters.getUser.id + '?type=logout')
+              this.$store.commit("REMOVE_INFO")
+              this.$router.push("/login")
+
+            })
+          }
+        }
       },
       checkLogin() {
         if(!this.$store.getters.getUser){

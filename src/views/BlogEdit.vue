@@ -88,7 +88,6 @@
           if (valid) {
             const _this = this
             this.ruleForm.content = this.render;
-            console.log(this.render)
             this.$axios.post('/blog/edit', this.ruleForm, {
               headers: {
                 "Authorization": localStorage.getItem("token")

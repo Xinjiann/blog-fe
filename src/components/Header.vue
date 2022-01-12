@@ -2,12 +2,25 @@
   <div class="m-content">
     <br>
 
-    <el-row :gutter="2">
+    <el-row :gutter="1">
       <el-col :span="13">
         <div style="font-weight: 500; font-size: 15px; margin-left: 85%">欢迎来到树洞博客</div>
       </el-col>
-      <el-col :span="7">
-        <el-dropdown style="margin-left: 47%" trigger="click" @command="handleCommand" v-if="showSearch">
+
+      <el-col :span="5">
+        <el-dropdown style="margin-left: 57%" trigger="click" @command="handleSetting" v-if="showSearch">
+          <span class="el-dropdown-link" style="cursor: pointer" >
+            我的<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="profile">个人主页</el-dropdown-item>
+            <el-dropdown-item command="addBlog">发表博客</el-dropdown-item>
+            <el-dropdown-item command="logout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-col>
+      <el-col :span="1.2">
+        <el-dropdown style="margin-left: -30px" trigger="click" @command="handleCommand" v-if="showSearch">
           <span class="el-dropdown-link" style="cursor: pointer" >
             博客分类<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
@@ -113,6 +126,9 @@
       },
       search() {
         this.$emit("searchBlog", this.input)
+      },
+      handleSetting(command) {
+        this.$emit("settingJump", command)
       },
       handleCommand(command) {
         this.$emit("classSelect", command);
