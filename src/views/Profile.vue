@@ -9,7 +9,7 @@
     <span class="block">
       <el-upload 
         v-if="admin === 9866 || user.id === storeUserId"
-        action="http://47.104.92.236:8081/file/upload"
+        action="http://34.105.136.131:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
         :on-success="success"
@@ -20,13 +20,36 @@
       <div v-else>
         <el-avatar :size="65" :src="user.avatar"></el-avatar>
       </div>
-      <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2%">@{{ user.username }}</span>
+      <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2.3%">@{{ user.username }}</span>
       <span v-else style="font-size: 18px; color: dimgray">@{{ user.username }}</span>
     </span>
-    <el-link v-show="hasLogin" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray" >编辑</el-link>
+    <el-link v-show="hasLogin&ownBlog" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray; margin-left: 8px" >编辑</el-link>
+    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') === -1" @click="follow" class="el-icon-sugar" style="font-size: 13px; color: dimgray; margin-left: 8px" >关注</el-link>
+    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') != -1" @click="unFollow" class="el-icon-sugar" style="font-size: 13px; color: dimgray; margin-left: 8px" >取关</el-link>
+
+    <!-- <br> -->
+    <!-- <div v-show="!edit"><br></div> -->
+
+    <el-row :gutter="0" style="width: 30%; margin-left: 45.5%; color: gray; font-weight: 380">
+      <el-col :span="2">
+        关注
+      </el-col>
+
+      <el-col :span="1">
+        {{targetFollowedCount}}
+      </el-col>
+
+      <el-col :span="2" style="margin-left: 20px">
+        粉丝
+      </el-col>
+
+      <el-col :span="1">
+        {{targetFollowerCount}}
+      </el-col>
+      
+    </el-row>
+
     
-    <br>
-    <div v-show="!edit"><br></div>
 
     <div v-show="edit">
       <h1 style="margin-right: 11.8%; font-size: 13px; line-height: 6px">Name</h1>
@@ -43,7 +66,9 @@
       </el-tab-pane>
       <el-tab-pane label="收藏博客" name="second">
       </el-tab-pane>
-      <el-tab-pane v-if="user.id & user.id===1" label="关于我" name="third"></el-tab-pane>
+      <el-tab-pane label="关注列表" name="third"></el-tab-pane>
+      <el-tab-pane label="粉丝列表" name="fourth"></el-tab-pane>
+      <el-tab-pane v-if="user.id & user.id===1" label="关于我" name="fifth"></el-tab-pane>
       <!-- <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane> -->
     </el-tabs>
     <div v-if="showBlogs">
@@ -133,6 +158,47 @@
         </video-player>
       </el-col>
     </el-row>
+
+    <div v-show="showFollower">
+      <br>
+      <div  v-for="follower in followers" :key="follower.id">
+        <el-row :gutter="0" style="margin-left: 35%">
+          <el-col :span="1.5">
+            <img :src="follower.avatar" width="36" height="36" @click="toProfile(follower.id)" style="cursor: pointer; margin-right: 25%; vertical-align: middle; border-radius: 50%;"/>
+          </el-col>
+          <el-col :span="2">
+            <el-link @click="toProfile(follower.id)">{{follower.username}}</el-link>
+          </el-col>
+
+          <el-col :span="14">
+            <el-link @click="rmFollower(follower.id)">
+              移除粉丝
+            </el-link>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+
+    <div v-show="showFollowed">
+      <br>
+      <div  v-for="user in followed" :key="user.id">
+        <el-row :gutter="0" style="margin-left: 35%">
+          <el-col :span="1.5">
+            <img :src="user.avatar" width="36" height="36" @click="toProfile(user.id)" style="cursor: pointer; margin-right: 25%; vertical-align: middle; border-radius: 50%;"/>
+          </el-col>
+          <el-col :span="2">
+            <el-link @click="toProfile(user.id)">{{user.username}}</el-link>
+          </el-col>
+
+          <el-col :span="14">
+            <el-link @click="rmFollowed(user.id)">
+              取关
+            </el-link>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -178,6 +244,15 @@
         },
         storeUserId: '',
         hasLogin: false,
+        ownBlog: false,
+        followers: [],
+        followed: [],
+        targetFollower: [],
+        targetFollowed: [],
+        targetFollowerCount: 0,
+        targetFollowedCount: 0,
+        showFollowed: false,
+        showFollower: false,
         input: '',
         days: [],
         blogs: {},
@@ -213,24 +288,151 @@
       }
     },
     methods: {
+      toProfile(id) {
+        this.$router.push("Profile" + id)
+      },
+      rmFollower(id) {
+        if (!this.ownBlog) {
+          this.$message.error('非本人')
+        } else {
+            this.$axios.get('/unFollow?targetId=' + this.userId + '&followerId=' + id).then(res => {
+            this.getFollower();
+            this.initTargetFollowerCount();
+          })
+        }
+      },
+      rmFollowed(id) {
+        if (!this.ownBlog) {
+          this.$message.error('非本人')
+        } else {
+            this.$axios.get('/unFollow?targetId=' + id + '&followerId=' + this.userId).then(res => {
+            this.getFollowed();
+            this.initTargetFollowedCount();
+          })
+        }
+      },
+      getFollower() {
+        this.$axios.get('/getTargetFollowerCount?targetId='+this.userId).then(res => {
+
+          if (res.data.data.length>0) {
+            this.$axios.post('/user/getUsers', res.data.data).then(res => {
+              let userInfo = res.data.data
+              userInfo.forEach(i => {
+                if (i.avatar != '') {
+                  this.$axios.get("/file/getUrl/"+i.avatar).then(res =>{
+                    i.avatar = res.data.data
+                  })
+                } else {
+                  i.avatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
+                }
+              })
+              this.followers = res.data.data
+            })
+          } else {
+            this.followers = {}
+          }
+        })
+      },
+      getFollowed() {
+        this.$axios.get('/getTargetFollowedCount?targetId='+this.userId).then(res => {
+          if (res.data.data.length>0) {
+            this.$axios.post('/user/getUsers', res.data.data).then(res => {
+              let userInfo = res.data.data
+              userInfo.forEach(i => {
+                if (i.avatar != '') {
+                  this.$axios.get("/file/getUrl/"+i.avatar).then(res =>{
+                    i.avatar = res.data.data
+                  })
+                } else {
+                  i.avatar = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.51yuansu.com%2Fpic3%2Fcover%2F02%2F63%2F69%2F59fc9e8a7a49e_610.jpg&refer=http%3A%2F%2Fpic.51yuansu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1643737983&t=20c09318fb5b88ccf706c093b748fcf1'
+                }
+              })
+              this.followed = res.data.data
+            })
+          } else {
+            this.followed = {}
+          }
+          console.log(this.followed)
+        })
+      },
+      initTargetFollowerCount() {
+        this.$axios.get('/getTargetFollowerCount?targetId='+this.userId).then(res => {
+          this.targetFollower = res.data.data
+          this.targetFollowerCount = res.data.data.length
+        })
+      },
+      initTargetFollowedCount() {
+        this.$axios.get('/getTargetFollowedCount?targetId='+this.userId).then(res => {
+          this.targetFollowed = res.data.data
+          this.targetFollowedCount = res.data.data.length
+        })
+      },
+      follow() {
+        if (!this.$store.getters.getUser.id) {
+          this.$message("请先登录")
+        } else {
+          this.$axios.get('/follow?targetId=' + this.userId + '&followerId=' + this.$store.getters.getUser.id).then(res => {
+            this.getFollower();
+            this.getFollowed();
+            this.initTargetFollowerCount();
+            this.initTargetFollowedCount();
+          })
+        }
+      },
+      unFollow() {
+        if (!this.$store.getters.getUser.id) {
+          this.$message("请先登录")
+        } else {
+          this.$axios.get('/unFollow?targetId=' + this.userId + '&followerId=' + this.$store.getters.getUser.id).then(res => {
+            this.getFollower();
+            this.getFollowed();
+            this.initTargetFollowerCount();
+            this.initTargetFollowedCount();
+          })
+        }
+      },
       showVideos(){
         this.showAboutMe = false;
         this.showVideo = true
       },
       handleClick(tab) {
         if (tab.index === '0') {
+          this.showFollower = false;
+          this.showFollowed = false;
           this.showBlogs = true;
           this.showFavorite = false;
           this.showAboutMe = false;
           this.showVideo = false;
         }
         if (tab.index === '1') {
+          this.showFollower = false;
+          this.showFollowed = false;
           this.showBlogs = false;
           this.showFavorite = true;
           this.showAboutMe = false;
           this.showVideo = false;
         }
         if (tab.index === '2') {
+          this.getFollowed();
+          this.showFollower = false;
+          this.showBlogs = false;
+          this.showFavorite = false;
+          this.showAboutMe = false;
+          this.showVideo = false;
+          this.showFollowed = true;
+        }
+        if (tab.index === '3') {
+          this.getFollower();
+          this.showFollowed = false;
+          this.showBlogs = false;
+          this.showFavorite = false;
+          this.showAboutMe = false;
+          this.showVideo = false;
+          this.showFollower = true;
+        }
+        if (tab.index === '4') {
+          this.showFollower = false;
+          this.showFollowed = false;
           this.showBlogs = false;
           this.showFavorite = false;
           this.showVideo = false;
@@ -329,14 +531,9 @@
         this.$router.go(-1);
       },
       async initUser() {
-        if (typeof this.$route.params.id != 'undefined') {
+        if (!typeof this.$route.params.id != 'undefined') {
           this.userId = this.$route.params.id;
-        } else {
-          if (this.$store.getters.getUser.id) {
-            this.userId = this.$store.getters.getUser.id
-          }
         }
-
         if (this.userId) {
           await this.$axios.get("/user/getUser/" + this.userId).then(res => {
             this.user.id = res.data.data.id;
@@ -359,9 +556,14 @@
             });      
           }
           this.hasLogin = true;
+          ///判断是否为自己博客
+          this.ownBlog = (this.userId === this.$store.getters.getUser.id) || (this.userId === this.$store.getters.getUser.id+'');
+          console.log(this.ownBlog)
           this.getFavorite(1);
           this.initBlogs();
           this.getRecord();
+          this.initTargetFollowerCount();
+          this.initTargetFollowedCount();
         } 
       },
       getFavorite(currentPage) {
@@ -416,11 +618,18 @@
     },
     created() {
       this.initUser();
-    }
+    },
+    watch: {
+      $route () {
+        this.$router.go(0)
+      }
+}
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+  @import "../assets/scss/index";
 
   .m-content {
     max-width: 100%;
@@ -473,6 +682,60 @@
     width: 178px;
     height: 178px;
     display: block;
+  }
+
+  .comment {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid $border-fourth;
+    .info {
+      display: flex;
+      align-items: center;
+      .avatar {
+        border-radius: 50%;
+      }
+      .right {
+        display: flex;
+        flex-direction: column;
+        margin-left: 10px;
+        .name {
+          font-size: 16px;
+          color: $text-main;
+          margin-bottom: 5px;
+          font-weight: 500;
+        }
+        .date {
+          font-size: 12px;
+          color: $text-minor;
+        }
+      }
+    }
+    .content {
+      font-size: 16px;
+      color: $text-main;
+      line-height: 20px;
+      padding: 10px 0;
+    }
+    .control {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: $text-minor;
+      .like {
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+        cursor: pointer;
+        &.active, &:hover {
+          color: $color-main;
+        }
+        .iconfont {
+          font-size: 14px;
+          margin-right: 5px;
+        }
+      }
+    }
   }
 
 </style>

@@ -47,7 +47,7 @@ const routes = [
     component: BlogEdit
   },
   {
-    path: '/profile',
+    path: '/profile:id',
     name: 'Profile',
     component: Profile
   },
