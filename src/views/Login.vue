@@ -22,7 +22,15 @@
             <el-input v-model="ruleForm.username"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input type="password" v-model="ruleForm.password"></el-input>
+            <el-input :type="type" v-model="ruleForm.password">
+              <i
+                slot="suffix"
+                class="icon-style"
+                :class="elIcon"
+                autocomplete="auto"
+                @click="flag = !flag"
+              />
+            </el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" size="small" @click="submitForm('ruleForm')" style="margin-right: 4px">登陆</el-button>
@@ -40,6 +48,7 @@ export default {
   name: "Login",
   data() {
     return {
+      flag: false,
       ruleForm: {
         username: "",
         password: "",
@@ -54,6 +63,14 @@ export default {
         ],
       },
     };
+  },
+  computed: {
+    type() {
+      return this.flag ? "text" : "password";
+    },
+    elIcon() {
+      return this.flag ? "el-icon-minus" : "el-icon-view";
+    },
   },
   methods: {
     toResetPassWord() {

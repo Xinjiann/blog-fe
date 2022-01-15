@@ -9,16 +9,32 @@
         <h3 style="line-height: 30px">欢迎注册</h3>
       </el-header>
       <el-main style="width:100%; margin-left: 0 auto">
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 400px; margin-left: 35%">
+        <el-form :model="ruleForm"  :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 400px; margin-left: 35%">
           <el-form-item label="账号" prop="username">
           <el-input v-model="ruleForm.username"></el-input>
            <!-- placeholder="请输入账号" -->
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="ruleForm.password" autocomplete="off"></el-input>
+            <el-input v-model="ruleForm.password" autocomplete="off" :type="type">
+              <i
+                slot="suffix"
+                class="icon-style"
+                :class="elIcon"
+                autocomplete="auto"
+                @click="flag = !flag"
+              />
+            </el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="checkPass">
-            <el-input v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+            <el-input v-model="ruleForm.checkPass" autocomplete="off" :type="type2">
+              <i
+                slot="suffix"
+                class="icon-style"
+                :class="elIcon2"
+                autocomplete="auto"
+                @click="flag2 = !flag2"
+              />
+            </el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="ruleForm.email"></el-input>
@@ -78,6 +94,8 @@
       };
       
       return {
+        flag: false,
+        flag2: false,
         ruleForm: {
           username: '',
           password: '',
@@ -104,6 +122,20 @@
       
         }
       };
+    },
+    computed: {
+      type() {
+        return this.flag ? "text" : "password";
+      },
+      elIcon() {
+        return this.flag ? "el-icon-minus" : "el-icon-view";
+      },
+      type2() {
+        return this.flag2 ? "text" : "password";
+      },
+      elIcon2() {
+        return this.flag2 ? "el-icon-minus" : "el-icon-view";
+      }
     },
     methods: {
       goBack() {

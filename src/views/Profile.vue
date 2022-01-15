@@ -23,9 +23,9 @@
       <span v-if="hasLogin" style="font-size: 18px; color: dimgray; margin-left: 2.3%">@{{ user.username }}</span>
       <span v-else style="font-size: 18px; color: dimgray">@{{ user.username }}</span>
     </span>
-    <el-link v-show="hasLogin&ownBlog" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray; margin-left: 8px" >编辑</el-link>
-    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') === -1" @click="follow" class="el-icon-sugar" style="font-size: 13px; color: dimgray; margin-left: 8px" >关注</el-link>
-    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') != -1" @click="unFollow" class="el-icon-sugar" style="font-size: 13px; color: dimgray; margin-left: 8px" >取关</el-link>
+    <el-link v-show="hasLogin&ownBlog" @click="showEdit" class="el-icon-edit" style="font-size: 13px; color: dimgray; margin-left: 8px; line-height: 25px" >编辑</el-link>
+    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') === -1" @click="follow" class="el-icon-sugar" style="font-size: 13px; color: #C45757; margin-left: 8px; line-height: 25px" >关注</el-link>
+    <el-link v-show="!ownBlog&hasLogin&targetFollower.indexOf(this.$store.getters.getUser.id+'') != -1" @click="unFollow" class="el-icon-sugar" style="font-size: 13px; color: #C45757; margin-left: 8px; line-height: 25px" >取关</el-link>
 
     <!-- <br> -->
     <!-- <div v-show="!edit"><br></div> -->
@@ -51,9 +51,9 @@
 
     
 
-    <div v-show="edit">
-      <h1 style="margin-right: 11.8%; font-size: 13px; line-height: 6px">Name</h1>
-      <el-input v-model="inputUsername" placeholder="用户名" style="width: 14%; margin: 0 auto" size="small" @keyup.enter.native="editUsername"></el-input><br><br>
+    <div v-show="edit" style="margin-top: -15px">
+      <h1 style="margin-right: 10.5%; font-size: 13px; line-height: 6px">Name</h1>
+      <el-input v-model="inputUsername" placeholder="用户名" style="width: 14%; margin-left: 10px" size="small" @keyup.enter.native="editUsername"></el-input><br><br>
       <!-- <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
       <el-input v-model="input" placeholder="请输入内容" style="width: 14%" size="large"></el-input><br><br> -->
       <!-- <el-button size="mini" type="primary">确定</el-button>
