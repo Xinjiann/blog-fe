@@ -19,6 +19,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </el-col>
+
       <el-col :span="1.2">
         <el-dropdown style="margin-left: -30px" trigger="click" @command="handleCommand" v-if="showSearch">
           <span class="el-dropdown-link" style="cursor: pointer" >
@@ -38,6 +39,23 @@
           </el-dropdown-menu>
         </el-dropdown>
       </el-col>
+
+      <!-- <el-col :span="5">
+        <el-dropdown style="margin-left: 57%" trigger="click" @command="handleSetting" v-if="showSearch">
+          <span class="el-dropdown-link" style="cursor: pointer" >
+            消息<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="profile">
+              互动消息 -->
+              <!-- <el-badge class="mark" :value="12" />
+            </el-dropdown-item>
+            <el-dropdown-item command="addBlog">私信</el-dropdown-item>
+            <el-dropdown-item command="logout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-col> -->
+
     </el-row><br>
     
     

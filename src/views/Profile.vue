@@ -1,7 +1,7 @@
 <template>
   <div class="m-content">
     <vue-canvas-nest :config="config"></vue-canvas-nest>
-    <el-page-header @back="goBack" content="个人主页">
+    <el-page-header @back="goBack" :content=headerName>
     </el-page-header>
 
     <h3>欢迎来到树洞博客</h3><br>
@@ -9,7 +9,7 @@
     <span class="block">
       <el-upload 
         v-if="admin === 9866 || user.id === storeUserId"
-        action="http://34.105.136.131:8081/file/upload"
+        action="http://47.104.92.236:8081/file/upload"
         :data="extraData"
         :before-upload="beforeAvatarUpload"
         :on-success="success"
@@ -52,8 +52,8 @@
     
 
     <div v-show="edit" style="margin-top: -15px">
-      <h1 style="margin-right: 10.5%; font-size: 13px; line-height: 6px">Name</h1>
-      <el-input v-model="inputUsername" placeholder="用户名" style="width: 14%; margin-left: 10px" size="small" @keyup.enter.native="editUsername"></el-input><br><br>
+      <h1 style="margin-right: 10%; font-size: 13px; line-height: 6px">Name</h1>
+      <el-input v-model="inputUsername" placeholder="用户名" style="width: 14%; margin-left: 14px" size="small" @keyup.enter.native="editUsername"></el-input><br><br>
       <!-- <h1 style="margin-right: 12.8%; font-size: 12px; line-height: 6px">Bio</h1>
       <el-input v-model="input" placeholder="请输入内容" style="width: 14%" size="large"></el-input><br><br> -->
       <!-- <el-button size="mini" type="primary">确定</el-button>
@@ -216,6 +216,7 @@
     },
     data() {
       return {
+        headerName: '',
         activeName: 'first',
         showBlogs: true,
         showFavorite: false,
@@ -558,7 +559,7 @@
           this.hasLogin = true;
           ///判断是否为自己博客
           this.ownBlog = (this.userId === this.$store.getters.getUser.id) || (this.userId === this.$store.getters.getUser.id+'');
-          console.log(this.ownBlog)
+          this.headerName = this.user.username+'的个人主页'
           this.getFavorite(1);
           this.initBlogs();
           this.getRecord();

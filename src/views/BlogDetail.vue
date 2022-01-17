@@ -68,7 +68,7 @@
       <el-divider></el-divider>
       <div class="markdown-body" v-html="blog.content"></div>
       <el-divider></el-divider>
-      <Comment :comments="comments" @like="like" :key="refresh"></Comment><br>
+      <Comment :comments="comments" @comment="comment" @like="like" @delete="deleteComment" :key="refresh"></Comment><br>
 
       <el-pagination class="mpage"
                      background
@@ -96,6 +96,7 @@
     components: {Header, Comment, vueCanvasNest},
     data() {
       return {
+        userInfo: '',
         refresh: 0,
         config: {
           color: "255,0,0",
@@ -162,6 +163,7 @@
       }
     },
     created() {
+      this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       this.checkLogin();
       this.blogId = this.$route.params.blogId;
       this.initFavorite();
@@ -169,6 +171,32 @@
       this.page(1);
     },
     methods: {
+      comment(inputComment) {
+        if(!this.$store.getters.getUser.id){
+          this.$message('请先登录')
+        } else {
+          if(inputComment===''){
+            this.$message('评论内容不能为空')
+          }else {
+            const blogId = this.$route.params.blogId
+            const commentForm = {
+              blogId: blogId,
+              createUser: this.userInfo.username,
+              content: inputComment,
+              createUserId: this.userInfo.id,
+            }
+            this.$axios.post('/comment/comment', commentForm).then(res => {
+              // 保存记录
+              this.$axios.get('/records/add/'+ commentForm.createUserId + '?type=comment')
+              this.$alert('操作成功', '提示', {
+                callback: action => {
+                  this.page(1)
+                }
+              });
+            })
+          }
+        }
+      },
       submitClass() {
         this.$axios.get("blog/editClass/" + this.blogId + '?class=' + this.selectValue).then(res => {
           this.$message.success("修改成功")
@@ -220,6 +248,13 @@
           })
         });
         this.refresh++;
+      },
+      async deleteComment(id) {
+        await this.$confirm('确定删除吗?');
+        this.$axios.get('comment/delete?id=' + id).then(res => {
+          this.page(this.currentPage)
+          this.$message.success("删除成功")
+        })
       },
       toProfile(){
         this.$router.push({name: "Profile", params: {id: this.createUserId}})

@@ -40,6 +40,10 @@
           <i class="iconfont icon-comment"></i>
           <span>回复</span>
         </span>
+        <span class="comment-delete" @click="deleteComment(item.id)" v-if="item.createUserId === userInfo.id">
+          <i class="iconfont icon-comment"></i>
+          <span>删除</span>
+        </span>
       </div>
       <div class="reply">
         <div class="item" v-for="(reply,index) in item.reply.replies" :key="index">
@@ -104,6 +108,10 @@
     },
     computed: {},
     methods: {
+      deleteComment(id) {
+        this.$emit('delete', id);
+        
+      },
       toProfile(createUser) {
         this.$axios.get('/user/getUser/'+createUser).then(res => {
           const userId = res.data.data.id;
@@ -137,31 +145,8 @@
        * 提交评论
        */
       commitComment(inputComment) {
-        
-        if(!this.$store.getters.getUser.id){
-          this.$message('请先登录')
-        } else {
-          if(inputComment===''){
-            this.$message('评论内容不能为空')
-          }else {
-            const blogId = this.$route.params.blogId
-            const commentForm = {
-              blogId: blogId,
-              createUser: this.userInfo.username,
-              content: inputComment,
-              createUserId: this.userInfo.id,
-            }
-            this.$axios.post('/comment/comment', commentForm).then(res => {
-              // 保存记录
-              this.$axios.get('/records/add/'+ commentForm.createUserId + '?type=comment')
-              this.$alert('操作成功', '提示', {
-                callback: action => {
-                  this.$router.go(0);
-                }
-              });
-            })
-          }
-        }
+        this.$emit('comment', inputComment)
+        this.inputComment='';
       },
 
       commitReply(commentId, inputComment) {
@@ -273,6 +258,19 @@
           display: flex;
           align-items: center;
           cursor: pointer;
+          &:hover {
+            color: $text-333;
+          }
+          .iconfont {
+            font-size: 16px;
+            margin-right: 5px;
+          }
+        }
+        .comment-delete {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          margin-left: 18px;
           &:hover {
             color: $text-333;
           }
