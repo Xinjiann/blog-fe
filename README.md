@@ -4,9 +4,9 @@
 
 项目地址: 
 
-国内访问：暂时停止维护 
+国内访问：[www.helloworld-blog.co.uk](47.104.92.236)
 
-国外访问：[www.helloworld-blog.co.uk](http://www.helloworld-blog.co.uk)
+国外访问：暂时停止维护 
 
 初始账号密码：guest
 
