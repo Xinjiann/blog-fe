@@ -4,7 +4,7 @@
 
 项目地址: 
 
-国内访问：[www.helloworld-blog.co.uk](47.104.92.236)
+国内访问：[www.helloworld-blog.co.uk](http://47.104.92.236)
 
 国外访问：暂时停止维护 
 
